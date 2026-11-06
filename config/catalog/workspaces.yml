@@ -1,0 +1,19 @@
+workspaces:
+  DEV_lz036_Engineering:
+    workspace_id: "416da27a-eb2f-4c41-ba76-9a9c66f5d240"
+  ACC_lz036_Engineering:
+    workspace_id: "edbc3714-62b5-4ab6-ac63-be4d1235fbae"
+  PRD_lz036_Engineering:
+    workspace_id: "6a306621-9db1-47cf-9a69-a6a24b230652"
+  DEV_lz036_data_models:
+    workspace_id: "f3b465eb-8e22-4d69-b7d0-02c76076fe54"
+  ACC_lz036_data_models:
+    workspace_id: "faaf6fc1-d281-4694-9c40-d67196b024ae"
+  PRD_lz036_data_models:
+    workspace_id: "7fa2426e-b259-47f1-8e1c-e0edf94079d5"
+  DEV_lz036_reports:
+    workspace_id: "39004ec0-dc97-403b-9255-f230f77cb6eb"
+  ACC_lz036_reports:
+    workspace_id: "897ad7f9-335c-4b49-896e-2e332469a94c"
+  PRD_lz036_reports:
+    workspace_id: "6bcb0a77-eddb-4e7a-90e8-5278e0e07729"

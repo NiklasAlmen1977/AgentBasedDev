@@ -1,0 +1,20 @@
+# Release config for the lz036 reports workspace.
+#
+# ga_lz036 hosts three independently-deployed workspaces side by side
+# (Engineering/, Data_models/, Reports/), each a single-workspace
+# workspace_root with its own release config and its own target workspace
+# per environment (see catalog/workspaces.yml). This config covers only the
+# Reports/ subtree, published to the *_lz036_reports workspaces.
+# fabric-cicd republishes everything in item_types_in_scope on every run;
+# there is no per-item items_to_include restriction on release.
+#
+
+item_name: "lz036_reports"
+
+
+acc:
+  target_workspace_name: "ACC_lz036_reports"
+
+
+prd:
+  target_workspace_name: "PRD_lz036_reports"

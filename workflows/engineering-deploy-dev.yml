@@ -1,0 +1,27 @@
+name: Engineering Deploy DEV
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Engineering/**"
+
+jobs:
+  deploy:
+    uses: group-analytics/ga_github_automation/.github/workflows/reusable-fabric-deploy-dev.yml@main
+    with:
+      workspace_catalog_path: .github/config/catalog/workspaces.yml
+      workspace_layout: single-workspace
+      workspace_root: "Engineering"
+      dev_workspace_name: DEV_lz036_engineering
+      config_files_path: "Engineering/ConfigFiles/environments"
+      config_validator_script_path: "Engineering/ConfigFiles/scripts/validate_config.py"
+      variable_library_path: "Engineering/Variables/vl_lz036_01.VariableLibrary"
+      lakehouse_display_name: "lh_lz036_bronze_01"
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      pull-requests: read

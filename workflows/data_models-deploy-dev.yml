@@ -1,0 +1,23 @@
+name: Data Models Deploy DEV
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Data_models/**"
+
+jobs:
+  deploy:
+    uses: group-analytics/ga_github_automation/.github/workflows/reusable-fabric-deploy-dev.yml@main
+    with:
+      workspace_catalog_path: .github/config/catalog/workspaces.yml
+      workspace_layout: single-workspace
+      workspace_root: "Data_models"
+      dev_workspace_name: DEV_lz036_data_models
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      pull-requests: read

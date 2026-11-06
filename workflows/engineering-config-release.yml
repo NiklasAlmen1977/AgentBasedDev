@@ -1,0 +1,31 @@
+name: Engineering Config Files Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - dev
+          - acc
+          - prd
+
+jobs:
+  deploy-config:
+    uses: group-analytics/ga_github_automation/.github/workflows/reusable-config-files-release.yml@main
+    with:
+      config_files_path: "Engineering/ConfigFiles/environments"
+      config_validator_script_path: "Engineering/ConfigFiles/scripts/validate_config.py"
+      workspace_catalog_path: .github/config/catalog/workspaces.yml
+      release_config_path: .github/config/release/engineering.yml
+      target_environment: ${{ inputs.target_environment }}
+      variable_library_path: "Engineering/Variables/vl_lz036_01.VariableLibrary"
+      lakehouse_display_name: "lh_lz036_bronze_01"
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      pull-requests: read

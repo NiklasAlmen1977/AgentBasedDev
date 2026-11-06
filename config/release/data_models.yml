@@ -1,0 +1,41 @@
+# Release config for the lz036 data_models workspace.
+#
+# ga_lz036 hosts three independently-deployed workspaces side by side
+# (Engineering/, Data_models/, Reports/), each a single-workspace
+# workspace_root with its own release config and its own target workspace
+# per environment (see catalog/workspaces.yml). This config covers only the
+# Data_models/ subtree, published to the *_lz036_data_models workspaces.
+# fabric-cicd republishes everything in item_types_in_scope on every run;
+# there is no per-item items_to_include restriction on release.
+#
+# The Aaro endpoint validation v2 semantic model is Import mode: it reads the
+# Engineering lakehouses through their SQL analytics endpoint (a host name
+# held in p_sql_endpoint_server_host_name) and SharePoint (site URL
+# parameters). item_dependencies can't express either, so literal
+# 'replacements' swap the DEV-authored values. The report binds to the model
+# by path within this workspace, which fabric-cicd rewires on its own.
+
+item_name: "lz036_data_models"
+
+acc:
+  target_workspace_name: "ACC_lz036_data_models"
+  replacements:
+    # <tenant segment>-<workspace GUID as little-endian base32>; ACC_lz036_Engineering.
+    - find_value: "ec4f6sr6czquxc2jahu67vhbxq-pkrg2qjp5nauzotwtkogn5osia.datawarehouse.fabric.microsoft.com"
+      replace_value: "ec4f6sr6czquxc2jahu67vhbxq-cq33z3nvmk3evlddxzgrenp3vy.datawarehouse.fabric.microsoft.com"
+    # Matches p_sharepoint_site_root_path's current value only: not its allowed-values list, and not
+    # p_analytics_metadata_site_root_path (spaced 'IsParameterQuery = true'), which must stay PROD.
+    - find_value: 'GroupAnalytics-Infiles-PROD" meta [IsParameterQuery=true'
+      replace_value: 'GroupAnalytics-Infiles-ACC" meta [IsParameterQuery=true'
+    - find_value: 'p_datawarehouse_server_host_name = "DEV_ServerHostName"'
+      replace_value: 'p_datawarehouse_server_host_name = "ACC_ServerHostName"'
+
+prd:
+  target_workspace_name: "PRD_lz036_data_models"
+  replacements:
+    # <tenant segment>-<workspace GUID as little-endian base32>; PRD_lz036_Engineering.
+    - find_value: "ec4f6sr6czquxc2jahu67vhbxq-pkrg2qjp5nauzotwtkogn5osia.datawarehouse.fabric.microsoft.com"
+      replace_value: "ec4f6sr6czquxc2jahu67vhbxq-eftda2vrtxhupgtju2rewiygki.datawarehouse.fabric.microsoft.com"
+    # p_sharepoint_site_root_path already holds the PROD site.
+    - find_value: 'p_datawarehouse_server_host_name = "DEV_ServerHostName"'
+      replace_value: 'p_datawarehouse_server_host_name = "PRD_ServerHostName"'

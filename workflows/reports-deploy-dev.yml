@@ -1,0 +1,23 @@
+name: Reports Deploy DEV
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Reports/**"
+
+jobs:
+  deploy:
+    uses: group-analytics/ga_github_automation/.github/workflows/reusable-fabric-deploy-dev.yml@main
+    with:
+      workspace_catalog_path: .github/config/catalog/workspaces.yml
+      workspace_layout: single-workspace
+      workspace_root: "Reports"
+      dev_workspace_name: DEV_lz036_reports
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      pull-requests: read

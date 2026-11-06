@@ -1,0 +1,9 @@
+# Cross-workspace item catalog.
+#
+# ga_lz036 is a single-workspace repository (workspace_layout:
+# single-workspace) — every item in this repo shares the same target
+# workspace per environment, so most dependencies between items here are
+# same_workspace and resolve dynamically at deploy time (see
+# .github/config/release/engineering.yml). This catalog is only needed for
+# items released to a *different* workspace (scope: cross_workspace).
+#

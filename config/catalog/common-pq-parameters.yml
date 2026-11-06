@@ -1,0 +1,10 @@
+# Common Power Query parameters, keyed by environment.
+#
+# Not used by ga_lz036 yet (no M-code parameters use the
+# __PARAM__<name>__ placeholder convention). Kept present because
+# reusable-fabric-release.yml always requires a common_parameter_path input.
+environments:
+  TEST:
+    power_query_parameters: {}
+  PROD:
+    power_query_parameters: {}

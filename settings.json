@@ -1,0 +1,58 @@
+{
+  "permissions": {
+    "defaultMode": "default",
+    "disableAutoMode": "disable",
+    "disableBypassPermissionsMode": "disable",
+    "allow": [
+      "Bash(git status:*)",
+      "PowerShell(git status:*)",
+      "Bash(git diff:*)",
+      "PowerShell(git diff:*)",
+      "Bash(git log:*)",
+      "PowerShell(git log:*)",
+      "Bash(git branch:*)",
+      "PowerShell(git branch:*)",
+      "Bash(git show:*)",
+      "PowerShell(git show:*)",
+      "Bash(git rev-list:*)",
+      "PowerShell(git rev-list:*)",
+      "Bash(git fetch:*)",
+      "PowerShell(git fetch:*)",
+      "Bash(gh pr view:*)",
+      "PowerShell(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "PowerShell(gh pr list:*)",
+      "Bash(gh pr checks:*)",
+      "PowerShell(gh pr checks:*)",
+      "Bash(gh auth status:*)",
+      "PowerShell(gh auth status:*)",
+      "Read(//**/ga_analytics_standards/**)",
+      "Read(//**/ga_templates_pbi/**)",
+      "Read(~/.claude/plugins/**)"
+    ],
+    "deny": [
+      "Edit(//**/ga_analytics_standards/**)",
+      "Edit(//**/ga_templates_pbi/**)"
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "fabric-collection": {
+      "source": {
+        "source": "git",
+        "url": "https://vitrolife-group.ghe.com/group-analytics/skills-for-fabric.git"
+      },
+      "autoUpdate": true
+    },
+    "ga-collection": {
+      "source": {
+        "source": "git",
+        "url": "https://vitrolife-group.ghe.com/group-analytics/ga_analytics_standards.git"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "powerbi-authoring@fabric-collection": true,
+    "ga-standards@ga-collection": true
+  }
+}

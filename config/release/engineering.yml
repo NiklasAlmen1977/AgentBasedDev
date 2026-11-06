@@ -1,0 +1,91 @@
+# Release config for the lz036 engineering workspace.
+#
+# ga_lz036 uses workspace_layout: single-workspace — the whole repo is
+# one Fabric workspace, and a release run always publishes every item in the
+# repo to a single target workspace (fabric-cicd republishes everything in
+# item_types_in_scope on every run; there is no per-item items_to_include
+# restriction on release). So there is one release config for the whole
+# workspace, not one per item, and item_name here is a stable identifier for
+# this config rather than a specific item's name.
+#
+
+item_name: "lz036_engineering"
+
+# KQLQueryset excluded: eh_lz036_01_queryset1's same-workspace KQLDatabase
+# reference hits a known upstream fabric-cicd bug (issue #1105) that no
+# release config can fix - see "KQLQueryset same-workspace data source
+# limitation" in ga_github_automation's README. Remove once fabric-cicd
+# ships a fix; reconnect the queryset's data source manually in the
+# meantime if needed in TEST/PROD.
+exclude_item_types:
+  - "KQLQueryset"
+
+acc:
+  target_workspace_name: "ACC_lz036_engineering"
+  item_dependencies:
+    - dependency_item_name: "workspace"
+      dependency_item_type: "Workspace"
+      scope: same_workspace
+      find_value: "416da27a-eb2f-4c41-ba76-9a9c66f5d240"  # DEV workspace GUID
+      dynamic_variable: "$workspace.$id"
+    - dependency_item_name: "lh_lz036_bronze_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "e90e2a0a-4398-4802-b20a-63e4b0d91b48"  # DEV bronze lakehouse GUID (OneLake path form)
+    - dependency_item_name: "lh_lz036_silver_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "98584fcb-a8e0-4225-9432-7501fcd549cb"  # DEV silver lakehouse GUID (OneLake path form)
+    - dependency_item_name: "lh_lz036_gold_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "0be6aaff-0726-4d71-9e72-ad1b50433c1f"  # DEV gold lakehouse GUID (OneLake path form)
+    - dependency_item_name: "lh_lz036_landing_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "6ec5d0b1-072a-46df-9759-baba9f748478"  # DEV landing lakehouse GUID (OneLake path form)
+    - dependency_item_name: "eh_lz036_01"
+      dependency_item_type: "Eventhouse"
+      scope: same_workspace
+      find_value: "e0563919-46b1-48e5-88f0-d1db7eb1dec1"  # DEV eventhouse GUID (OneLake path form)
+    # - dependency_item_name: "Test deploy (sm)"
+    #   dependency_item_type: "SemanticModel"
+    #   scope: cross_workspace
+    #   find_workspace_name: "DEV_ai001_Data"
+    #   find_semantic_model_name: "Test deploy (sm)"
+    #   find_semantic_model_id: "39e2762b-b77b-4199-8e21-9d298f7dc1a3"
+
+prd:
+  target_workspace_name: "PRD_lz036_engineering"
+  item_dependencies:
+    - dependency_item_name: "workspace"
+      dependency_item_type: "Workspace"
+      scope: same_workspace
+      find_value: "416da27a-eb2f-4c41-ba76-9a9c66f5d240"  # DEV workspace GUID
+      dynamic_variable: "$workspace.$id"
+    - dependency_item_name: "lh_lz036_bronze_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "e90e2a0a-4398-4802-b20a-63e4b0d91b48"  # DEV bronze lakehouse GUID (OneLake path form)
+    - dependency_item_name: "lh_lz036_silver_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "98584fcb-a8e0-4225-9432-7501fcd549cb"  # DEV silver lakehouse GUID (OneLake path form)
+    - dependency_item_name: "lh_lz036_gold_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "0be6aaff-0726-4d71-9e72-ad1b50433c1f"  # DEV gold lakehouse GUID (OneLake path form)
+    - dependency_item_name: "lh_lz036_landing_01"
+      dependency_item_type: "Lakehouse"
+      scope: same_workspace
+      find_value: "6ec5d0b1-072a-46df-9759-baba9f748478"  # DEV landing lakehouse GUID (OneLake path form)
+    - dependency_item_name: "eh_lz036_01"
+      dependency_item_type: "Eventhouse"
+      scope: same_workspace
+      find_value: "e0563919-46b1-48e5-88f0-d1db7eb1dec1"  # DEV eventhouse GUID (OneLake path form)
+    # - dependency_item_name: "Test deploy (sm)"
+    #   dependency_item_type: "SemanticModel"
+    #   scope: cross_workspace
+    #   find_workspace_name: "DEV_ai001_Data"
+    #   find_semantic_model_name: "Test deploy (sm)"
+    #   find_semantic_model_id: "39e2762b-b77b-4199-8e21-9d298f7dc1a3"

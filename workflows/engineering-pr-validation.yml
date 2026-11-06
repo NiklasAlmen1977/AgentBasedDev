@@ -1,0 +1,23 @@
+name: Engineering PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "Engineering/**"
+
+jobs:
+  validate:
+    uses: group-analytics/ga_github_automation/.github/workflows/reusable-fabric-pr-validation.yml@main
+    with:
+      workspace_layout: single-workspace
+      workspace_root: "Engineering"
+      config_files_path: "Engineering/ConfigFiles/environments"
+      config_validator_script_path: "Engineering/ConfigFiles/scripts/validate_config.py"
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      pull-requests: read
+    secrets: inherit

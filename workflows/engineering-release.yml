@@ -1,0 +1,34 @@
+name: Engineering Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - acc
+          - prd
+
+jobs:
+  release:
+    uses: group-analytics/ga_github_automation/.github/workflows/reusable-fabric-release.yml@main
+    with:
+      item_name: "lz036_engineering"
+      target_environment: ${{ inputs.target_environment }}
+      workspace_root: "Engineering"
+      workspace_catalog_path: .github/config/catalog/workspaces.yml
+      item_catalog_path: .github/config/catalog/items.yml
+      common_parameter_path: .github/config/catalog/common-pq-parameters.yml
+      release_config_path: .github/config/release/engineering.yml
+      config_files_path: "Engineering/ConfigFiles/environments"
+      config_validator_script_path: "Engineering/ConfigFiles/scripts/validate_config.py"
+      variable_library_path: "Engineering/Variables/vl_lz036_01.VariableLibrary"
+      lakehouse_display_name: "lh_lz036_bronze_01"
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
+      pull-requests: read
