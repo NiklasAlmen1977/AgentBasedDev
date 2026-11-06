@@ -1,0 +1,19 @@
+/// Dynamic RLS directly on GL Balance Snapshots* (the model has no Company dimension): each user sees the company codes listed for their UPN in _RLS Company Access; Company code ALL gives all companies. Assign one Entra group with all users to this role in the Power BI service. Users not in the access list see no rows.
+role 'Company access'
+	modelPermission: read
+
+	tablePermission '_RLS Company Access' = '_RLS Company Access'[UPN] = LOWER( USERPRINCIPALNAME( ) )
+
+	tablePermission 'GL Balance Snapshots*' =
+			VAR _v_user = LOWER( USERPRINCIPALNAME( ) )
+			VAR _v_company_codes =
+			    CALCULATETABLE(
+			        VALUES( '_RLS Company Access'[Company code] ),
+			        '_RLS Company Access'[UPN] = _v_user
+			    )
+			RETURN
+			    "ALL" IN _v_company_codes
+			        || 'GL Balance Snapshots*'[company_code] IN _v_company_codes
+
+	annotation PBI_Id = aae907468c3149f290791faca9599ae7
+

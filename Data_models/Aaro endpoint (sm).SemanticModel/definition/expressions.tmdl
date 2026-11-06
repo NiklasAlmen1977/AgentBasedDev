@@ -1,0 +1,311 @@
+/// Host name of the on-premises SQL Server data warehouse for the environment (DEV, TEST or ACC, PRD), for example vitro-bicdev. Kept while models still read from the on-premises data warehouse. Same value as Datawarehouse_ServerHostName in the Analytics environments list.
+expression p_datawarehouse_server_host_name = "DEV_ServerHostName" meta [IsParameterQuery=true, List={"DEV_ServerHostName", "TEST_ServerHostName", "ACC_ServerHostName", "PRD_ServerHostName"}, DefaultValue="DEV_ServerHostName", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 5e6b0640-95ac-4c79-9641-ce02990bb020
+	queryGroup: '1. Parameters\1.1 Connection parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Host name of the Fabric SQL analytics endpoint (lakehouse or warehouse) for the environment (DEV, TEST or ACC, PRD). In Fabric: SQL analytics endpoint > Settings > SQL connection string. Same value as SqlEndpoint in the Analytics environments list.
+expression p_sql_endpoint_server_host_name = "ec4f6sr6czquxc2jahu67vhbxq-pkrg2qjp5nauzotwtkogn5osia.datawarehouse.fabric.microsoft.com" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type text, List = {"ec4f6sr6czquxc2jahu67vhbxq-pkrg2qjp5nauzotwtkogn5osia.datawarehouse.fabric.microsoft.com", "TEST_SqlEndpointServerHostName", "ACC_SqlEndpointServerHostName", "PRD_SqlEndpointServerHostName"}, DefaultValue = "ec4f6sr6czquxc2jahu67vhbxq-pkrg2qjp5nauzotwtkogn5osia.datawarehouse.fabric.microsoft.com"]
+	lineageTag: b41f6c2e-8d3a-4e57-9a1c-7e0d2f5b6a83
+	queryGroup: '1. Parameters\1.1 Connection parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Base URL of the SharePoint site with the domain's data files. Open the site's home page and copy the URL.
+expression p_sharepoint_site_root_path =
+		"https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-PROD" meta [IsParameterQuery=true, List={
+		            "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-DEV",
+		            "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-TEST",
+		            "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-ACC",
+		            "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-PROD"
+		        }, DefaultValue="https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-DEV", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: d00dbd34-f9d1-42bf-9383-b7bc868fd531
+	queryGroup: '1. Parameters\1.1 Connection parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// The relative folder path within the SharePoint site (below the root) that points to your data files.
+expression p_sharepoint_folder_path = "AccessRights/AaroEndpointValidation/" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type text, List = {"AccessRights/AaroEndpointValidation/"}, DefaultValue = "AccessRights/AaroEndpointValidation/"]
+	lineageTag: 20532ae3-2458-42ec-b300-5c0c55acda31
+	queryGroup: '1. Parameters\1.1 Connection parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Exception
+
+/// Base URL of the Group Analytics metadata SharePoint site for the environment (DEV, TEST or ACC, PROD; TEST is being replaced by ACC). Used by the _Report Info, _Metric business definition and _Environment snippets. Apply this snippet first, and only once per model.
+expression p_analytics_metadata_site_root_path = "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-PROD" meta [IsParameterQuery = true, IsParameterQueryRequired = true, Type = type text, List = {"https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-DEV", "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-TEST", "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-ACC", "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-PROD"}, DefaultValue = "https://vitrolifeglobal.sharepoint.com/sites/GroupAnalytics-Infiles-DEV"]
+	lineageTag: a21e9cc6-1751-4c8b-9529-c66e001d46d0
+	queryGroup: '1. Parameters\1.1 Connection parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Text used for missing (null) dimension members.
+expression p_null_member_string = "Unknown" meta [IsParameterQuery=true, List={"Unknown"}, DefaultValue="Unknown", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: dfe751c8-a72f-4115-8215-758c3a05b667
+	queryGroup: '1. Parameters\1.2 Parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Overrides the automatic environment detection. Keep "Automatic environment detection" unless you test against another environment.
+expression p_environment_manual = "Automatic environment detection" meta [IsParameterQuery=true, List={"Automatic environment detection", "DEV", "TEST", "ACC", "PROD"}, DefaultValue="Automatic environment detection", Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 887a2607-561a-4681-ab48-4a7f4c2b9530
+	queryGroup: '1. Parameters\1.2 Parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Name of this report, used to select its row in the Analytics Report Info list.
+expression p_report_name = "Aaro endpoint (sm)" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 3e4549b8-bc8c-460e-9cf2-efda001598f6
+	queryGroup: '1. Parameters\1.2 Parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Name of this semantic model, used to select its row in the Analytics Report Info list.
+expression p_semantic_model_name = "Aaro endpoint (sm)" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: ef59b743-1ead-4113-a380-3f441bf7b3a2
+	queryGroup: '1. Parameters\1.2 Parameters'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Text
+
+/// Source query for the table aaro_integration.fact_gl_balance_snapshot on the SQL analytics endpoint of lh_lz036_gold_01: the Aaro export, summed per company, accounting period and account, with the sign reversed for global account 2-9. The server comes from p_sql_endpoint_server_host_name. Not loaded; GL Balance Snapshots* reads from it.
+expression src_aaro_integration_fact_gl_balance_snapshot =
+		let
+		    Source = Sql.Database(p_sql_endpoint_server_host_name, "lh_lz036_gold_01"),
+		    Navigation = Source{[Schema = "aaro_integration", Item = "fact_gl_balance_snapshot"]}[Data]
+		in
+		    Navigation
+	lineageTag: 31c44776-6b7e-43b7-a0e6-d30774ffcb41
+	queryGroup: '3. Source'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Source query for the RLS access list: Excel table tbl_rls_gfo_aaro_access in rls_aaro_endpoint_validation.xlsx, in the folder p_sharepoint_folder_path (ending with /) on the Infiles SharePoint site p_sharepoint_site_root_path.
+expression src_excel_rls_gfo_aaro_access =
+		let
+		    Source = SharePoint.Files(p_sharepoint_site_root_path, [ApiVersion = 15]),
+		  #"Filtered rows 1" = Table.SelectRows(Source, each Text.EndsWith([Folder Path], p_sharepoint_folder_path)),
+		  #"Filtered rows" = Table.SelectRows(#"Filtered rows 1", each [Name] = "rls_aaro_endpoint_validation.xlsx"),
+		  Navigation = #"Filtered rows"{0}[Content],
+		  #"Imported Excel workbook" = Excel.Workbook(Navigation, null, true),
+		  #"Filtered rows 2" = Table.SelectRows(#"Imported Excel workbook", each ([Kind] = "Table") and ([Name] = "tbl_rls_gfo_aaro_access")),
+		  #"Navigation 1" = #"Filtered rows 2"{0}[Data],
+		  #"Changed column type" = Table.TransformColumnTypes(#"Navigation 1", {{"Company code", type text}, {"Contact 1", type text}, {"Contact 2", type text}})
+		in
+		    #"Changed column type"
+	lineageTag: 3b8e2f4a-6c1d-4e9a-b7f2-1d5a8c3e9b60
+	queryGroup: '3. Source'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Base connection to the analytics environments list on the Group Analytics metadata SharePoint site.
+expression src_sharepoint_analytics_environment =
+		let
+		    // ----------------------------------
+		    // Connect to SharePoint
+		    // Exposes all lists and libraries as tables
+		    // ----------------------------------
+		    Source =
+		        SharePoint.Tables(
+		            p_analytics_metadata_site_root_path,
+		            [Implementation = "2.0", ViewMode = "All"]
+		        ),
+		
+		    // ----------------------------------
+		    // Select Microsoft List by List Id
+		    // This list defines available analytics environments
+		    // ----------------------------------
+		    ListItems_AnalyticsEnvironments =
+		        Source{[Id = "ab9f8ca7-d3f3-4e5e-ab62-91e6ed70f659"]}[Items],
+		
+		    // ----------------------------------
+		    // Remove SharePoint system columns
+		    // Keep only business-relevant environment attributes
+		    // ----------------------------------
+		    Removed_UnusedColumns =
+		        Table.RemoveColumns(
+		            ListItems_AnalyticsEnvironments,
+		            {
+		                "Created",
+		                "Modified",
+		                "Modified By",
+		                "Title",
+		                "Color Tag",
+		                "Compliance Asset Id",
+		                "ID",
+		                "Content Type",
+		                "Created By",
+		                "Version",
+		                "Attachments",
+		                "Edit",
+		                "Type",
+		                "Item Child Count",
+		                "Folder Child Count",
+		                "Label setting",
+		                "Retention label",
+		                "Retention label Applied",
+		                "Label applied by",
+		                "Item is a Record",
+		                "App Created By",
+		                "App Modified By"
+		            }
+		        )
+		in
+		    Removed_UnusedColumns
+	lineageTag: 342fa5c9-a6e9-4382-bfc6-ca61989eb6f0
+	queryGroup: '3. Source'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// Base connection to the Analytics Report Info list on the Group Analytics metadata SharePoint site, filtered to this report or semantic model.
+expression src_sharepoint_analytics_report_info =
+		let
+		    // ----------------------------------
+		    // Connect to SharePoint
+		    // Exposes all lists and libraries as tables
+		    // ----------------------------------
+		    Source =
+		        SharePoint.Tables(
+		            p_analytics_metadata_site_root_path,
+		            [Implementation = "2.0", ViewMode = "All"]
+		        ),
+		
+		    // ----------------------------------
+		    // Select Microsoft List by List Id
+		    // Contains report and semantic model metadata
+		    // ----------------------------------
+		    ListItems_AnalyticsReportInfo =
+		        Source{[Id = "c567f6e5-621c-4d2b-8968-245deee1f232"]}[Items],
+		
+		    // ----------------------------------
+		    // Remove SharePoint system columns
+		    // Keep only report metadata fields
+		    // ----------------------------------
+		    Removed_UnusedColumns =
+		        Table.RemoveColumns(
+		            ListItems_AnalyticsReportInfo,
+		            {
+		                "Created By",
+		                "Modified",
+		                "Modified By",
+		                "Title",
+		                "Color Tag",
+		                "Compliance Asset Id",
+		                "ID",
+		                "Content Type",
+		                "Created",
+		                "Version",
+		                "Attachments",
+		                "Edit",
+		                "Type",
+		                "Item Child Count",
+		                "Folder Child Count",
+		                "Label setting",
+		                "Retention label",
+		                "Retention label Applied",
+		                "Label applied by",
+		                "Item is a Record",
+		                "App Created By",
+		                "App Modified By"
+		            }
+		        ),
+		
+		    // ----------------------------------
+		    // Filter to relevant report or semantic model
+		    // Set p_report_name and p_semantic_model_name for each model
+		    // ----------------------------------
+		    Filtered_ToSelectedReportOrModel =
+		        Table.SelectRows(
+		            Removed_UnusedColumns,
+		            each Text.Contains([Report], p_report_name)
+		                or Text.Contains([Report], p_semantic_model_name)
+		        )
+		in
+		    Filtered_ToSelectedReportOrModel
+	lineageTag: f2bf0261-7eac-4f53-b925-cd2ec925f5a9
+	queryGroup: '3. Source'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+/// The environment the model is connected to, as one row with friendly column names.
+expression stg_analytics_environment =
+		let
+		    Source = src_sharepoint_analytics_environment,
+		
+		    // ----------------------------------
+		    // Filter to the active environment:
+		    // the manual choice, or automatic detection from the model's
+		    // own connection parameters, in this order:
+		    // 1. Fabric SQL analytics endpoint (SqlEndpoint)
+		    // 2. On-premises data warehouse server (Datawarehouse_ServerHostName)
+		    // 3. Infiles SharePoint site (SharePoint_SiteRoot_Path)
+		    // The metadata site itself is always PROD, so it cannot be used.
+		    // ----------------------------------
+		    Matched_SqlEndpoint =
+		        Table.SelectRows(Source, each [SqlEndpoint] <> null and [SqlEndpoint] = p_sql_endpoint_server_host_name),
+		    Matched_DatawarehouseServer =
+		        Table.SelectRows(Source, each [Datawarehouse_ServerHostName] <> null and [Datawarehouse_ServerHostName] = p_datawarehouse_server_host_name),
+		    Matched_SharePointSite =
+		        Table.SelectRows(Source, each [SharePoint_SiteRoot_Path] = p_sharepoint_site_root_path),
+		
+		    Filtered_ToSelectedEnvironment =
+		        if p_environment_manual <> "Automatic environment detection" then
+		            Table.SelectRows(Source, each [Environment] = p_environment_manual)
+		        else if not Table.IsEmpty(Matched_SqlEndpoint) then
+		            Matched_SqlEndpoint
+		        else if not Table.IsEmpty(Matched_DatawarehouseServer) then
+		            Matched_DatawarehouseServer
+		        else
+		            Matched_SharePointSite,
+		
+		    // ----------------------------------
+		    // Friendly names (SharePoint list column names stay unchanged)
+		    // ----------------------------------
+		    Renamed_Columns =
+		        Table.RenameColumns(
+		            Filtered_ToSelectedEnvironment,
+		            {
+		                {"DisplayName", "Display name"},
+		                {"BackgroundHex", "Background hex"},
+		                {"TextHex", "Text hex"},
+		                {"IsProd", "Is prod"},
+		                {"SharePoint_SiteRoot_Path", "SharePoint site root path"},
+		                {"Datawarehouse_ServerHostName", "Data warehouse server host name"},
+		                {"SqlEndpoint", "SQL endpoint server host name"},
+		                {"SqlDatabaseName", "SQL database name"}
+		            }
+		        )
+		in
+		    Renamed_Columns
+	lineageTag: 539a527f-833a-45b2-afae-b1575d264cdb
+	queryGroup: '4. Stage'
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

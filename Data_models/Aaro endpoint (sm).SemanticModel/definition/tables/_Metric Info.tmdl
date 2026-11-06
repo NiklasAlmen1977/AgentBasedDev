@@ -1,0 +1,94 @@
+/// Lists the visible measures in __Metrics and GL Balance Snapshots* (where this model keeps its measures) with description, DAX and display folder, for the Definition page.
+table '_Metric Info'
+	isHidden
+	lineageTag: 470a0e19-ec6c-4b67-abff-69576acc47f0
+
+	/// Message about the report or semantic model from _Report Info, or empty text when there is none.
+	measure 'Report or semantic model message' =
+			
+			VAR _v_message = SELECTEDVALUE( '_Report Info'[Message] )
+			RETURN
+			    IF( ISBLANK( _v_message ), "", _v_message )
+		isHidden
+		displayFolder: .Report
+		lineageTag: 8b727b9d-beb4-4a90-93a3-0e9dbc0e47a1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Measure
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 6d58a40f-e345-490a-b3e9-7c31a120a647
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Measure]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column Description
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 58f73983-d044-47d4-a0f7-271f4478ba7d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Description]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DAX formula'
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: cf55f910-a5c9-4b49-8097-e1ed37150c76
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DAX formula]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column Table
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 8a82f747-d6c7-441d-9c2d-d6228deac900
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Table]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Display folder'
+		isHidden
+		isAvailableInMdx: false
+		lineageTag: 931af99c-8ae0-441a-afa3-8d5ca2299578
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Display folder]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	partition '_Metric Info' = calculated
+		mode: import
+		source =
+				VAR _v_measures =
+				    SELECTCOLUMNS(
+				        FILTER(
+				            INFO.VIEW.MEASURES( ),
+				            [IsHidden] = FALSE( )
+				                && [Table] IN { "__Metrics", "GL Balance Snapshots*" }
+				        ),
+				        "Measure", [Name],
+				        "Description", [Description],
+				        "DAX formula", [Expression],
+				        "Table", [Table],
+				        "Display folder", MID( SUBSTITUTE( SUBSTITUTE( "\" & [DisplayFolder], "\.", "\" ), "\", " / " ), 4, 500 )
+				    )
+				RETURN
+				    _v_measures
+
+	annotation PBI_Id = 73454e33b29642f4a4a0fe5d9f4832e2
+

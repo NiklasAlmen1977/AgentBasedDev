@@ -1,0 +1,29 @@
+/// Measures table from the template. Empty in this model: the measures are in GL Balance Snapshots*, the only fact table, so Excel users find them next to the columns.
+table __Metrics
+	isHidden
+	lineageTag: caa296fe-a325-4e40-b36a-31a1b41386be
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 4c26b1f3-52c2-4ac4-8721-f6d8a41186ae
+		summarizeBy: none
+		sourceColumn: dummy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	partition __Metrics = m
+		mode: import
+		queryGroup: '5. Load to Data Model\Disconnected Tables'
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlSKjQUA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [dummy = _t])
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

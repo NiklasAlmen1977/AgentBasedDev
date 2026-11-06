@@ -1,0 +1,285 @@
+/// The Aaro export: one row per company, accounting period, global account, product area, responsibility and counter company, already summed and with the sign reversed for global account 2-9. Amounts are in each company's own currency. Read from Excel to upload to Aaro: the column names and the actuals measure have the names of the Excel upload sheet (snake_case, a documented exception to the naming conventions), and missing values are empty text.
+table 'GL Balance Snapshots*'
+	lineageTag: 35478304-d194-42b0-af2c-8e229a6a1018
+
+	/// Amount as it goes to Aaro, from the Aaro export table: already summed for the accounting period and with the sign reversed for global account 2-9 (multiplied by -1). Blank when the row or total covers more than one company or accounting period, because amounts are in each company's own currency. Used by the report and by the Excel upload file (Power Query), so the check looks at the current row, not at the selection; the report export table waits for a selection with the measure Is one company and period selected.
+	measure actuals =
+
+			// Checks the current row or total (not ALLSELECTED), so Excel Power Query rows get a value; totals over several companies or periods stay blank
+			VAR _v_is_one_company =
+			    HASONEVALUE( 'GL Balance Snapshots*'[company_code] )
+			VAR _v_is_one_period =
+			    HASONEVALUE( 'GL Balance Snapshots*'[accounting_period] )
+			VAR _v_result =
+			    IF(
+			        _v_is_one_company && _v_is_one_period,
+			        SUM( 'GL Balance Snapshots*'[Actuals reversed] )
+			    )
+			RETURN
+			    _v_result
+		formatString: #,0.00
+		displayFolder: .Aaro export
+		lineageTag: 96259d5a-3f65-4e67-868a-3047f9e83463
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["NC_FIELD_SENTENCE_CASE"]}
+
+	/// 1 when exactly one company and one accounting period are selected in the filters or slicers, otherwise 0. Visual-level filter (= 1) on the export table, so the table stays empty until the GFO has made both selections.
+	measure 'Is one company and period selected' =
+
+			// ALLSELECTED checks the selection (filter pane, slicers), not the rows of the visual
+			VAR _v_is_one_company_selected =
+			    CALCULATE(
+			        HASONEVALUE( 'GL Balance Snapshots*'[company_code] ),
+			        ALLSELECTED( 'GL Balance Snapshots*'[company_code] )
+			    )
+			VAR _v_is_one_period_selected =
+			    CALCULATE(
+			        HASONEVALUE( 'GL Balance Snapshots*'[accounting_period] ),
+			        ALLSELECTED( 'GL Balance Snapshots*'[accounting_period] )
+			    )
+			VAR _v_result =
+			    IF( _v_is_one_company_selected && _v_is_one_period_selected, 1, 0 )
+			RETURN
+			    _v_result
+		formatString: 0
+		isHidden
+		displayFolder: .Report
+		lineageTag: 3b7e9c41-6d2a-4f85-a1c3-8e5f0d7b2a96
+
+	/// The company and accounting period selected for the Aaro export, for example IARG, accounting period 2603A. Asks for a selection while not exactly one of each is selected.
+	measure 'Selected company and accounting period' =
+			
+			VAR _v_company =
+			    CALCULATE(
+			        SELECTEDVALUE( 'GL Balance Snapshots*'[company_code] ),
+			        ALLSELECTED( 'GL Balance Snapshots*'[company_code] )
+			    )
+			VAR _v_period =
+			    CALCULATE(
+			        SELECTEDVALUE( 'GL Balance Snapshots*'[accounting_period] ),
+			        ALLSELECTED( 'GL Balance Snapshots*'[accounting_period] )
+			    )
+			VAR _v_result =
+			    IF(
+			        ISBLANK( _v_company ) || ISBLANK( _v_period ),
+			        "Select one company and one accounting period in the filters",
+			        _v_company & ", accounting period " & _v_period
+			    )
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report
+		lineageTag: 0a6d3c1e-8b47-4f25-9e3a-5c1b7d2f4e86
+
+	/// Number of companies in the Aaro export that you have access to, regardless of the filters.
+	measure 'Export companies loaded' =
+			
+			CALCULATE(
+			    DISTINCTCOUNT( 'GL Balance Snapshots*'[company_code] ),
+			    REMOVEFILTERS( 'GL Balance Snapshots*' )
+			)
+		formatString: #,0
+		isHidden
+		displayFolder: .Data info
+		lineageTag: 4c8e1f7a-2d93-4b6e-a1c5-9f3e7b2d6a14
+
+	/// The company codes you have access to, for example IARG, ICAN. Shows the number of companies when there are more than ten.
+	measure 'Accessible companies' =
+			
+			// Row-level security decides which companies are left after the filters are removed
+			VAR _v_companies =
+			    CALCULATETABLE(
+			        VALUES( 'GL Balance Snapshots*'[company_code] ),
+			        REMOVEFILTERS( 'GL Balance Snapshots*' )
+			    )
+			VAR _v_company_count = COUNTROWS( _v_companies )
+			VAR _v_result =
+			    IF(
+			        _v_company_count <= 10,
+			        CONCATENATEX(
+			            _v_companies,
+			            'GL Balance Snapshots*'[company_code],
+			            ", ",
+			            'GL Balance Snapshots*'[company_code], ASC
+			        ),
+			        FORMAT( _v_company_count, "0" ) & " companies"
+			    )
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Data info
+		lineageTag: c6f96812-e45b-4aa3-bf99-5faf7043ec85
+
+	/// First and last accounting period in the Aaro export, for example 2303A - 2609A, regardless of the filters.
+	measure 'Accounting period range' =
+			
+			VAR _v_first_period =
+			    CALCULATE(
+			        MIN( 'GL Balance Snapshots*'[accounting_period] ),
+			        REMOVEFILTERS( 'GL Balance Snapshots*' )
+			    )
+			VAR _v_last_period =
+			    CALCULATE(
+			        MAX( 'GL Balance Snapshots*'[accounting_period] ),
+			        REMOVEFILTERS( 'GL Balance Snapshots*' )
+			    )
+			VAR _v_result = _v_first_period & " - " & _v_last_period
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Data info
+		lineageTag: 7b2f9d4c-6e18-4a3b-8c5d-1e9a4f7b3c62
+
+	/// One line that shows what is selected in the Aaro export, for example Company IARG · Accounting period 2603A · Global account 3010. Blank values show as (blank); a field without a selection shows as all.
+	measure 'Label - Drillthrough selection' =
+			
+			// One value per field; (blank) when the row has no value, all when nothing is selected
+			VAR _v_company =
+			    IF( HASONEVALUE( 'GL Balance Snapshots*'[company_code] ), COALESCE( SELECTEDVALUE( 'GL Balance Snapshots*'[company_code] ), "(blank)" ), "all" )
+			VAR _v_period =
+			    IF( HASONEVALUE( 'GL Balance Snapshots*'[accounting_period] ), COALESCE( SELECTEDVALUE( 'GL Balance Snapshots*'[accounting_period] ), "(blank)" ), "all" )
+			VAR _v_global_account =
+			    IF( HASONEVALUE( 'GL Balance Snapshots*'[gl_global_account_no] ), COALESCE( SELECTEDVALUE( 'GL Balance Snapshots*'[gl_global_account_no] ), "(blank)" ), "all" )
+			VAR _v_product_area =
+			    IF( HASONEVALUE( 'GL Balance Snapshots*'[product_area_no] ), COALESCE( SELECTEDVALUE( 'GL Balance Snapshots*'[product_area_no] ), "(blank)" ), "all" )
+			VAR _v_responsibility =
+			    IF( HASONEVALUE( 'GL Balance Snapshots*'[responsibility_no] ), COALESCE( SELECTEDVALUE( 'GL Balance Snapshots*'[responsibility_no] ), "(blank)" ), "all" )
+			VAR _v_counter_company =
+			    IF( HASONEVALUE( 'GL Balance Snapshots*'[counter_company] ), COALESCE( SELECTEDVALUE( 'GL Balance Snapshots*'[counter_company] ), "(blank)" ), "all" )
+			VAR _v_result =
+			    "Selected in Aaro export:  Company " & _v_company
+			        & "  ·  Accounting period " & _v_period
+			        & "  ·  Global account " & _v_global_account
+			        & "  ·  Product area " & _v_product_area
+			        & "  ·  Responsibility " & _v_responsibility
+			        & "  ·  Counter company " & _v_counter_company
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report
+		lineageTag: 943fadf6-f649-49bd-a2b0-5b8a006530bc
+
+	/// Number of rows in the Aaro export that you have access to, regardless of the filters.
+	measure 'Export rows loaded' =
+			
+			CALCULATE(
+			    COUNTROWS( 'GL Balance Snapshots*' ),
+			    REMOVEFILTERS( 'GL Balance Snapshots*' )
+			)
+		formatString: #,0
+		isHidden
+		displayFolder: .Data info
+		lineageTag: 01c8e659-b97e-4c2f-bf0c-5894cfb3c547
+
+	/// Company code as in Navision, the company that owns the transaction, for example VSAB. Filtered by row-level security.
+	column company_code
+		dataType: string
+		lineageTag: b3e606ba-460e-417f-b826-ff5eb61264f2
+		summarizeBy: none
+		sourceColumn: company_code
+
+		annotation SummarizationSetBy = User
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["NC_FIELD_SENTENCE_CASE"]}
+
+	/// Accounting period as Aaro uses it: year, month and A, for example 2603A for March 2026.
+	column accounting_period
+		dataType: string
+		lineageTag: e9cbe38e-5191-403d-ba33-60caa6ab478e
+		summarizeBy: none
+		sourceColumn: accounting_period
+
+		annotation SummarizationSetBy = User
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["NC_FIELD_SENTENCE_CASE"]}
+
+	/// Account number in the group chart of accounts (Aaro), for example 3060.
+	column gl_global_account_no
+		dataType: string
+		lineageTag: f6137519-4fff-4d43-a439-321ebbb5ea4d
+		summarizeBy: none
+		sourceColumn: gl_global_account_no
+
+		annotation SummarizationSetBy = User
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["NC_FIELD_SENTENCE_CASE"]}
+
+	/// Product area number as Aaro expects it, for example 9.
+	column product_area_no
+		dataType: string
+		lineageTag: d6fcfba4-e75f-4dee-b777-0192b894f42d
+		summarizeBy: none
+		sourceColumn: product_area_no
+
+		annotation SummarizationSetBy = User
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["NC_FIELD_SENTENCE_CASE"]}
+
+	/// Responsibility number, the higher level of the cost center, for example 410.
+	column responsibility_no
+		dataType: string
+		lineageTag: 020bc9fc-cb13-4314-9332-af4f47747c86
+		summarizeBy: none
+		sourceColumn: responsibility_no
+
+		annotation SummarizationSetBy = User
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["NC_FIELD_SENTENCE_CASE"]}
+
+	/// Company code of the counterpart of the transaction, for example VLAB.
+	column counter_company
+		dataType: string
+		lineageTag: 55cb5573-87ee-4dc9-bb64-98dfb9a0787e
+		summarizeBy: none
+		sourceColumn: counter_company
+
+		annotation SummarizationSetBy = User
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["NC_FIELD_SENTENCE_CASE"]}
+
+	/// Summed amount for the accounting period with the sign reversed for global account 2-9, from the gold column actuals_reversed. Hidden: use the actuals measure.
+	column 'Actuals reversed'
+		dataType: decimal
+		isHidden
+		formatString: #,0.00
+		lineageTag: f8782d2d-a853-4cdc-b0e9-66180f6c9fda
+		summarizeBy: none
+		sourceColumn: actuals_reversed
+
+		annotation SummarizationSetBy = User
+
+	partition 'GL Balance Snapshots*' = m
+		mode: import
+		queryGroup: '5. Load to Data Model\Fact Tables'
+		source =
+				let
+				    Source = src_aaro_integration_fact_gl_balance_snapshot,
+				
+				    // Only actuals_reversed is used; the _ITD columns will be removed from the gold table
+				    Select_Columns =
+				        Table.SelectColumns(
+				            Source,
+				            {"company_code", "accounting_period", "gl_global_account_no", "product_area_no", "responsibility_no", "counter_company", "actuals_reversed"}
+				        ),
+				
+				    // Fixed decimal instead of floating point
+				    Change_Column_Types =
+				        Table.TransformColumnTypes(
+				            Select_Columns,
+				            {{"actuals_reversed", Currency.Type}}
+				        ),
+				
+				    // Empty text instead of null, so Excel shows an empty cell and not (blank)
+				    Replace_Nulls =
+				        Table.ReplaceValue(
+				            Change_Column_Types,
+				            null,
+				            "",
+				            Replacer.ReplaceValue,
+				            {"company_code", "accounting_period", "gl_global_account_no", "product_area_no", "responsibility_no", "counter_company"}
+				        )
+				in
+				    Replace_Nulls
+
+	annotation PBI_ResultType = Table
+

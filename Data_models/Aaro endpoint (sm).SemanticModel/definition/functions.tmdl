@@ -1,0 +1,1717 @@
+/// Dynamic format string generator for comparison values (in percent)
+/// Returns format string with directional indicators based on parameters
+function 'DaxLib.FormatString.RelativeToTarget.Percents' =
+		
+		// Dynamic format string generator for comparison values (in percent)
+		// Returns format string with directional indicators based on parameters
+		(
+		    // Position of comparison symbol
+		    // Expects "PREFIX" or "SUFFIX"
+		    position: STRING,
+		
+		    // Number of decimal places
+		    // Expects an INT64 value from 0-9
+		    decimal_places: INT64,
+		
+		    // Symbol style - number (1-9) or text:
+		    // 1 or "ARROWS": ↑/↓
+		    // 2 or "TRIANGLES": ▲/▼
+		    // 3 or "PLUSMINUS": +/-
+		    // 4 or "CHEVRONS": ˄/˅
+		    // 5 or "GREENRED": 🟢/🔴
+		    // 6 or "BLUEORANGE": 🔵/🟠
+		    // 7 or "BLOCKARROWS": ⬆/⬇
+		    // 8 or "CHECKCROSS": ✓/✗
+		    // 9 or "NONE": no symbol
+		    symbol: ANYVAL,
+		
+		    // Custom prefix text (optional)
+		    // Enter "" to skip parameter
+		    // Enter SELECTEDVALUE( 'Exchange Rate'[Currency Symbol] ) for dynamic currency conversion
+		    //
+		    // Note: Value is string-safe; no need for """"
+		    custom_prefix: EXPR,
+		
+		    // Custom suffix text (optional)
+		    // Enter "" to skip parameter
+		    // Enter SELECTEDVALUE( 'Exchange Rate'[Currency Symbol] ) for dynamic currency conversion
+		    // Enter " (" & FORMAT ( [PercentMeasure], "0.0%" ) & ")" to add a second value for context
+		    //
+		    // Note: Value is string-safe; no need for """"
+		    custom_suffix: EXPR
+		)
+		=>
+		    VAR _BaseFormat =
+		        DaxLib.FormatString.Component.DecimalPlaces( "#,##0", decimal_places ) & "%"
+		
+		    VAR _Prefix =
+		        DaxLib.FormatString.Component.MakeStringSafe ( custom_prefix )
+		
+		    VAR _Suffix =
+		        DaxLib.FormatString.Component.MakeStringSafe ( custom_suffix )
+		
+		    VAR _PositiveSymbol =
+		        DaxLib.FormatString.Component.Symbols ( symbol, "POSITIVE" )
+		
+		    VAR _NegativeSymbol =
+		        DaxLib.FormatString.Component.Symbols ( symbol, "NEGATIVE" )
+		
+		    VAR _PositiveFormat =
+		        _Prefix
+		            & SWITCH (
+		                position,
+		                "PREFIX", _PositiveSymbol & " " & _BaseFormat,
+		                "SUFFIX", _BaseFormat & " " & _PositiveSymbol,
+		                _BaseFormat & " " & _PositiveSymbol
+		            )
+		            &
+		        _Suffix
+		
+		    VAR _NegativeFormat =
+		        _Prefix
+		            & SWITCH (
+		                position,
+		                "PREFIX", _NegativeSymbol & " " & _BaseFormat,
+		                "SUFFIX", _BaseFormat & " " & _NegativeSymbol,
+		                _BaseFormat & " " & _NegativeSymbol
+		            )
+		            &
+		        _Suffix
+		
+		    VAR _ZeroFormat =
+		        _Prefix
+		            &
+		            _BaseFormat
+		            &
+		        _Suffix
+		
+		    RETURN
+		        _PositiveFormat & ";" & _NegativeFormat & ";" & _ZeroFormat
+	lineageTag: 4c60e6ca-b2b9-4988-a597-88065ccff269
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 944A0BF31EF09319E3FA2A386E8732E8E5CD8CE2BAD0C3E4119CA354EF81344F
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Convert duration in seconds to HH:MM:SS format string
+function 'DaxLib.FormatString.HHMMSS.Seconds' =
+		
+		// Convert duration in seconds to HH:MM:SS format string
+		// To be used on a measure that returns a value in seconds
+		() =>
+		    VAR _TotalSeconds = SELECTEDMEASURE ()
+		
+		    VAR _Hours =
+		        INT( _TotalSeconds / 3600 )
+		
+		    VAR _Minutes =
+		        INT( MOD( _TotalSeconds, 3600 ) / 60 )
+		
+		    VAR _Seconds =
+		        INT( MOD( _TotalSeconds, 60 ) )
+		
+		    VAR _Result =
+		        DaxLib.FormatString.Component.MakeStringSafe(
+		            FORMAT ( _Hours, "00" ) & ":" &
+		            FORMAT ( _Minutes, "00" ) & ":" &
+		            FORMAT ( _Seconds, "00" )
+		        )
+		
+		    RETURN
+		        _Result
+	lineageTag: 47363aa7-d026-46d7-8456-f66f094d7b97
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = ECA4428D782EAEE7D4D31643DC07CED98D94DECFD6D895E482151819D61C4A50
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Convert duration between start and end times to HH:MM:SS format string
+function 'DaxLib.FormatString.HHMMSS.StartTimeEndTime' =
+		
+		// Convert duration between start and end times to HH:MM:SS format string
+		(
+		    // Start datetime
+		    // Include measure, expression, or scalar value
+		    startTime: EXPR,
+		
+		    // End datetime
+		    // Include measure, expression, or scalar value
+		    endTime: EXPR
+		) =>
+		    VAR _DurationInSeconds =
+		        INT( ( endTime - startTime ) * 86400 )
+		
+		    VAR _Hours =
+		        INT( _DurationInSeconds / 3600 )
+		
+		    VAR _Minutes =
+		        INT( MOD( _DurationInSeconds, 3600 ) / 60 )
+		
+		    VAR _Seconds =
+		        INT( MOD( _DurationInSeconds, 60 ) )
+		
+		    VAR _Result =
+		        DaxLib.FormatString.Component.MakeStringSafe(
+		            FORMAT ( _Hours, "00" ) & ":" &
+		            FORMAT ( _Minutes, "00" ) & ":" &
+		            FORMAT ( _Seconds, "00" )
+		        )
+		
+		    RETURN
+		        _Result
+	lineageTag: 6f4978f7-0c0e-400c-b2b6-d4e5602b9728
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 7568F5DCEADDA11AEBD96D2DC916839518A53699AFD7B42F69ACFD03338B57E8
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Dynamic format string with automatic K/M/bn/tn suffix, rounding, and decimal places based on value magnitude
+/// Supports dynamic currency conversion
+function 'DaxLib.FormatString.DynamicUnits' =
+		
+		// Dynamic format string with automatic K/M/bn/tn suffix, rounding, and decimal places based on value magnitude
+		// Supports dynamic currency conversion
+		(
+		    // The value to format
+		    // Expects a numeric value or measure reference
+		    // Recommended: SELECTEDMEASURE()
+		    format_value: EXPR,
+		
+		    // The currency symbol you want to use
+		    // Expects a symbol like "$"
+		    // Enter "" for none
+		    // Use DaxLib.FormatString.Component.GetCurrencySymbol for dynamic currency conversion
+		    currency_symbol: STRING,
+		
+		    // Whether the currency should be a prefix or suffix
+		    // Expects "PREFIX" or "SUFFIX"
+		    // Enter "" for none
+		    // Use DaxLib.FormatString.Component.GetCurrencyPosition for dynamic currency conversion
+		    currency_position: STRING,
+		
+		    // Custom prefix (optional)
+		    // Enter "" for none
+		    // Note: Value is string-safe; no need for """"
+		    custom_prefix : EXPR,
+		
+		    // Custom suffix (optional)
+		    // Enter "" for none
+		    // Note: Value is string-safe; no need for """"
+		    custom_suffix : EXPR
+		)
+		=>
+		    VAR _NumberFormat =
+		        DaxLib.FormatString.Component.DynamicUnits( "#,##0", format_value )
+		
+		    VAR _CurrencySymbol =
+		        currency_symbol
+		
+		    VAR _CurrencyPosition =
+		        currency_position
+		
+		    VAR _Prefix =
+		        IF ( _CurrencyPosition = "PREFIX", _CurrencySymbol & " ", "" ) &
+		        DaxLib.FormatString.Component.MakeStringSafe( custom_prefix )
+		
+		    VAR _Suffix =
+		        IF ( _CurrencyPosition = "SUFFIX", " " & _CurrencySymbol, "" ) &
+		        DaxLib.FormatString.Component.MakeStringSafe( custom_suffix )
+		
+		    VAR _FormatString =
+		        _Prefix & _NumberFormat & _Suffix
+		
+		    RETURN
+		        _FormatString
+	lineageTag: f206baef-62ac-4ff8-916b-f1fb8c8b5720
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = C37922B047D78C54863B3C28CADCD96468D5640B534D7C4F2F1AEC32A0420784
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Get comparison symbol based on style and value sign
+/// Returns appropriate symbol for positive, negative, or zero values
+function 'DaxLib.FormatString.Component.Symbols' =
+		
+		// Get comparison symbol based on style and value sign
+		// Returns appropriate symbol for positive, negative, or zero values
+		(
+		    // Symbol style - number (1-9) or text:
+		    // 1 or "ARROWS": ↑/↓
+		    // 2 or "TRIANGLES": ▲/▼
+		    // 3 or "PLUSMINUS": +/-
+		    // 4 or "CHEVRONS": ˄/˅
+		    // 5 or "GREENRED": 🟢/🔴
+		    // 6 or "BLUEORANGE": 🔵/🟠
+		    // 7 or "BLOCKARROWS": ⬆/⬇
+		    // 8 or "CHECKCROSS": ✓/✗
+		    // 9 or "NONE": no symbol
+		    symbol_style: ANYVAL,
+		
+		    // Value type: "POSITIVE", "NEGATIVE", or "ZERO"
+		    value_type: STRING
+		)
+		=>
+		    VAR _SymbolCode =
+		        IF ( ISNUMBER ( symbol_style ),
+		            symbol_style,
+		            SWITCH ( UPPER ( symbol_style ),
+		                "ARROWS", 1,
+		                "TRIANGLES", 2,
+		                "PLUSMINUS", 3,
+		                "CHEVRONS", 4,
+		                "GREENRED", 5,
+		                "BLUEORANGE", 6,
+		                "BLOCKARROWS", 7,
+		                "CHECKCROSS", 8,
+		                "NONE", 9,
+		                9
+		            )
+		        )
+		
+		    VAR _Symbol =
+		        SWITCH ( value_type,
+		            "POSITIVE",
+		                SWITCH ( _SymbolCode,
+		                    1, "↑",
+		                    2, "▲",
+		                    3, "+",
+		                    4, "˄",
+		                    5, "🟢",
+		                    6, "🔵",
+		                    7, "⬆",
+		                    8, "✓",
+		                    9, "",
+		                    ""
+		                ),
+		            "NEGATIVE",
+		                SWITCH ( _SymbolCode,
+		                    1, "↓",
+		                    2, "▼",
+		                    3, "-",
+		                    4, "˅",
+		                    5, "🔴",
+		                    6, "🟠",
+		                    7, "⬇",
+		                    8, "✗",
+		                    9, "",
+		                    ""
+		                ),
+		            ""
+		        )
+		
+		    RETURN
+		        _Symbol
+	lineageTag: 4cf50d24-1a68-429b-ad12-21892fd2050a
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = B347E7F21E5DE7DDA2083254974D228595A87CE139314D0C8056B4CE1070811D
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Returns a 0 string repeated a number of times equal to the number of decimal places
+function 'DaxLib.FormatString.Component.DecimalPlaces' =
+		
+		// Returns a 0 string repeated a number of times equal to the number of decimal places
+		(
+		    // Base format string
+		    // Expects a valid format string base, i.e. "#,##0"
+		    base_format: STRING,
+		
+		    // Number of decimal places
+		    // Expects an integer value from 0-9
+		    decimal_places: INT64
+		)
+		=>
+		    base_format
+		    &
+		    IF (
+		        decimal_places > 0,
+		        "."
+		            & REPT ( "0", MIN ( decimal_places, 9 ) ),
+		        ""
+		    )
+	lineageTag: d6abfda9-03cf-4a86-96be-7a8a093ac11e
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 6CED0396F59EB4E9359946871708B988FC603AA96F6516A7DC2158DDD1C759A4
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Wraps strings in double-quotes to avoid issues with format string interpretation
+function 'DaxLib.FormatString.Component.MakeStringSafe' =
+		
+		// Wraps strings in double-quotes to avoid issues with format string interpretation
+		(
+		    // The value you want to put in the format string
+		    unsafe_string : STRING
+		)
+		=>
+		    """" & unsafe_string & """"
+	lineageTag: fe4e1228-dfd3-405f-b2a9-2346f44ba02a
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = DB480FD5B46A19871433C304F6EBE882B822944F80DA76B4AB07E17ADDD96D26
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Get currency format string based on currency code
+/// Returns appropriate number format with currency symbol placement
+function 'DaxLib.FormatString.DynamicCurrency' =
+		
+		// Get currency format string based on currency code
+		// Returns appropriate number format with currency symbol placement
+		(
+		    // Currency code (ISO 4217 three-letter code)
+		    // Examples: CAD, EUR, GBP, JPY, etc.
+		    // Expects a column reference used for selecting a currency in the report, like 'Exchange Rate'[Currency Code]
+		    currency_code: ANYREF,
+		
+		    // Base format string
+		    // Recommended: "#,##0"
+		    decimal_places: INT64
+		)
+		=>
+		    VAR _BaseFormat =
+		        DaxLib.FormatString.Component.DecimalPlaces( "#,##0", decimal_places )
+		
+		    VAR _CurrencyPosition =
+		        DaxLib.FormatString.Component.GetCurrencyPosition ( currency_code )
+		
+		    VAR _CurrencySymbol =
+		        DaxLib.FormatString.Component.GetCurrencySymbol ( currency_code )
+		
+		    VAR _Prefix =
+		        IF ( _CurrencyPosition = "PREFIX", _CurrencySymbol & " ", "" )
+		
+		    VAR _Suffix =
+		        IF ( _CurrencyPosition = "SUFFIX", " " & _CurrencySymbol, "" )
+		
+		    VAR _Format =
+		        _Prefix & _BaseFormat & _Suffix
+		
+		    RETURN
+		        _Format
+	lineageTag: 41026a1c-ff01-4bb5-a4f7-2442b93a5190
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 4B021B564BEF5E03E702E3405A8C911FD76F80E365DA75720F219C7C3CA68139
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Get currency symbol based on currency code
+/// Returns currency symbol as a string (e.g., "$" or "€")
+function 'DaxLib.FormatString.Component.GetCurrencySymbol' =
+		
+		// Get currency symbol based on currency code
+		// Returns currency symbol as a string (e.g., "$" or "€")
+		(
+		    // Currency code (ISO 4217 three-letter code)
+		    // Examples: CAD, EUR, GBP, JPY, etc.
+		    currency_code: ANYREF
+		)
+		=>
+		    VAR _Code =
+		        SELECTEDVALUE ( currency_code )
+		
+		    VAR _Currency =
+		        FILTER (
+		            -- Calc. table with common currencies and formats
+		            -- Optionally replace with your own, in-memory exchange rate table
+		            DaxLib.FormatString.Component.CurrencyTable(),
+		            ''[Currency Code] = _Code
+		        )
+		
+		    VAR _Symbol =
+		        SELECTCOLUMNS ( _Currency, ''[Currency Symbol] )
+		
+		    RETURN
+		        _Symbol
+	lineageTag: aabdf9c1-f3f1-4b93-a213-4e295685d151
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 0F63D2BC55AD4F256F79F62C5411D0A090A682ACFDDC52C05E79D7FFC3730767
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Get currency position based on currency code
+/// Returns either "PREFIX" or "SUFFIX"
+function 'DaxLib.FormatString.Component.GetCurrencyPosition' =
+		
+		// Get currency position based on currency code
+		// Returns either "PREFIX" or "SUFFIX"
+		(
+		    // Currency code (ISO 4217 three-letter code)
+		    // Examples: CAD, EUR, GBP, JPY, etc.
+		    currency_code: ANYREF
+		)
+		=>
+		    VAR _Code =
+		        SELECTEDVALUE ( currency_code )
+		
+		    VAR _Currency =
+		        FILTER (
+		            -- Calc. table with common currencies and formats
+		            -- Optionally replace with your own, in-memory exchange rate table
+		            DaxLib.FormatString.Component.CurrencyTable(),
+		            ''[Currency Code] = _Code
+		        )
+		
+		    VAR _Position =
+		        SELECTCOLUMNS ( _Currency, ''[Currency Position] )
+		
+		    RETURN
+		        _Position
+	lineageTag: cd51f0c9-1ade-4d48-8466-7013364f6197
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = C635C514C98192F0D85E77C9F35A5C8620EF4380081DF25B30363DE2071F16C5
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Helper function to dynamically round and format values
+function 'DaxLib.FormatString.Component.DynamicUnits' =
+		
+		// Helper function to dynamically round and format values
+		(
+		    // Base format string
+		    base_format: STRING,
+		    // Expects a valid format string base, i.e. "#,##0"
+		
+		    // The value to format
+		    // EXPR because it must be able to handle SELECTEDMEASURE() and arbitrary expressions
+		    format_value: EXPR
+		)
+		=>
+		    VAR _CurrentValue =
+		        format_value
+		
+		    VAR _Format =
+		        base_format &
+		        SWITCH (
+		            TRUE (),
+		            _CurrentValue <= 1E3, ".",
+		            _CurrentValue <= 1E4, ",.00 K",
+		            _CurrentValue <= 1E5, ",.0 K",
+		            _CurrentValue <= 1E6, ",. K",
+		            _CurrentValue <= 1E7, ",,.00 M",
+		            _CurrentValue <= 1E8, ",,.0 M",
+		            _CurrentValue <= 1E9, ",,. M",
+		            _CurrentValue <= 1E10, ",,,.00 bn",
+		            _CurrentValue <= 1E11, ",,,.0 bn",
+		            _CurrentValue <= 1E12, ",,,,. bn",
+		            _CurrentValue <= 1E13, ",,,,.00 tn",
+		            _CurrentValue <= 1E14, ",,,,,.0 tn",
+		            _CurrentValue <= 1E15, ",,,,,. tn"
+		        )
+		    RETURN
+		        _Format
+	lineageTag: d70912e3-2097-40f5-bbf5-fb5d04875434
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = FF9BDE924E3BF7534A7973BBF23D99ECFF4F9BB0C50DA1F0AFDDE22BCAE4AC7A
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Dynamic format string generator for comparison values (in value)
+/// Returns format string with directional indicators based on parameters
+function 'DaxLib.FormatString.RelativeToTarget.Numeric' =
+		
+		// Dynamic format string generator for comparison values (in value)
+		// Returns format string with directional indicators based on parameters
+		(
+		    // Position of comparison symbol
+		    // Expects "PREFIX" or "SUFFIX"
+		    position: STRING,
+		
+		    // Number of decimal places
+		    // Expects an INT64 value from 0-9
+		    decimal_places: INT64,
+		
+		    // Symbol style - number (1-9) or text:
+		    // 1 or "ARROWS": ↑/↓
+		    // 2 or "TRIANGLES": ▲/▼
+		    // 3 or "PLUSMINUS": +/-
+		    // 4 or "CHEVRONS": ˄/˅
+		    // 5 or "GREENRED": 🟢/🔴
+		    // 6 or "BLUEORANGE": 🔵/🟠
+		    // 7 or "BLOCKARROWS": ⬆/⬇
+		    // 8 or "CHECKCROSS": ✓/✗
+		    // 9 or "NONE": no symbol
+		    symbol: ANYVAL,
+		
+		    // Custom prefix text (optional)
+		    // Enter "" to skip parameter
+		    // Enter SELECTEDVALUE( 'Exchange Rate'[Currency Symbol] ) for dynamic currency conversion
+		    //
+		    // Note: Value is string-safe; no need for """"
+		    custom_prefix: EXPR,
+		
+		    // Custom suffix text (optional)
+		    // Enter "" to skip parameter
+		    // Enter SELECTEDVALUE( 'Exchange Rate'[Currency Symbol] ) for dynamic currency conversion
+		    // Enter " (" & FORMAT ( [PercentMeasure], "0.0%" ) & ")" to add a second value for context
+		    //
+		    // Note: Value is string-safe; no need for """"
+		    custom_suffix: EXPR
+		) =>
+		    VAR _BaseFormat =
+		        DaxLib.FormatString.Component.DecimalPlaces( "#,##0", decimal_places )
+		
+		    VAR _Prefix =
+		        DaxLib.FormatString.Component.MakeStringSafe ( custom_prefix )
+		
+		    VAR _Suffix =
+		        DaxLib.FormatString.Component.MakeStringSafe ( custom_suffix )
+		
+		    VAR _PositiveSymbol =
+		        DaxLib.FormatString.Component.Symbols ( symbol, "POSITIVE" )
+		
+		    VAR _NegativeSymbol =
+		        DaxLib.FormatString.Component.Symbols ( symbol, "NEGATIVE" )
+		
+		    VAR _PositiveFormat =
+		        _Prefix
+		            & SWITCH (
+		                position,
+		                "PREFIX",
+		                    _PositiveSymbol & " " & _BaseFormat,
+		                "SUFFIX",
+		                    _BaseFormat & " " & _PositiveSymbol,
+		                _BaseFormat & " " & _PositiveSymbol
+		            )
+		            & _Suffix
+		
+		    VAR _NegativeFormat =
+		        _Prefix
+		            & SWITCH (
+		                position,
+		                "PREFIX",
+		                    _NegativeSymbol & " " & _BaseFormat,
+		                "SUFFIX",
+		                    _BaseFormat & " " & _NegativeSymbol,
+		                _BaseFormat & " " & _NegativeSymbol
+		            )
+		            & _Suffix
+		
+		    VAR _ZeroFormat =
+		        _Prefix & _BaseFormat & _Suffix
+		
+		    RETURN
+		        _PositiveFormat & ";" & _NegativeFormat
+		            & ";"
+		            & _ZeroFormat
+	lineageTag: 98b36be6-bd8e-48b7-a471-42649656dbd9
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 74AEF93D4FF3CEC0CE1D5997FA1F0B5A936C15EC8C05CBD049587724AA5E1765
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Get currency reference table with codes, symbols, position, and format strings
+/// Returns table with currency metadata for use in other calculations
+function 'DaxLib.FormatString.Component.CurrencyTable' =
+		
+		// Get currency reference table with codes, symbols, position, and format strings
+		// Returns table with currency metadata for use in other calculations
+		()
+		=>
+		    VAR _CurrencyTable =
+		        DATATABLE (
+		            "Currency Code", STRING,
+		            "Currency Symbol", STRING,
+		            "Currency Position", STRING,
+		            "Format String", STRING,
+		            "Format String PNZ", STRING,
+		            {
+		                -- Major currencies
+		                { "CAD", "C$", "PREFIX", "C$#,##0", "C$#,##0;-C$#,##0;C$0" },
+		                { "EUR", "€", "SUFFIX", "#,##0 €", "#,##0 €;-#,##0 €;0 €" },
+		                { "GBP", "£", "PREFIX", "£#,##0", "£#,##0;-£#,##0;£0" },
+		                { "JPY", "¥", "PREFIX", "¥#,##0", "¥#,##0;-¥#,##0;¥0" },
+		                { "CHF", "CHF", "PREFIX", "CHF #,##0", "CHF #,##0;-CHF #,##0;CHF 0" },
+		
+		                -- Dollar variants
+		                { "USD", "$", "PREFIX", "$#,##0", "$#,##0;-$#,##0;$0" },
+		                { "AUD", "A$", "PREFIX", "A$#,##0", "A$#,##0;-A$#,##0;A$0" },
+		                { "NZD", "NZ$", "PREFIX", "NZ$#,##0", "NZ$#,##0;-NZ$#,##0;NZ$0" },
+		                { "HKD", "HK$", "PREFIX", "HK$#,##0", "HK$#,##0;-HK$#,##0;HK$0" },
+		                { "SGD", "S$", "PREFIX", "S$#,##0", "S$#,##0;-S$#,##0;S$0" },
+		                { "TWD", "NT$", "PREFIX", "NT$#,##0", "NT$#,##0;-NT$#,##0;NT$0" },
+		
+		                -- Asian currencies
+		                { "CNY", "¥", "PREFIX", "¥#,##0", "¥#,##0;-¥#,##0;¥0" },
+		                { "INR", "₹", "PREFIX", "₹#,##0", "₹#,##0;-₹#,##0;₹0" },
+		                { "KRW", "₩", "PREFIX", "₩#,##0", "₩#,##0;-₩#,##0;₩0" },
+		                { "THB", "฿", "PREFIX", "฿#,##0", "฿#,##0;-฿#,##0;฿0" },
+		                { "PHP", "₱", "PREFIX", "₱#,##0", "₱#,##0;-₱#,##0;₱0" },
+		                { "IDR", "Rp", "PREFIX", "Rp#,##0", "Rp#,##0;-Rp#,##0;Rp0" },
+		                { "MYR", "RM", "PREFIX", "RM#,##0", "RM#,##0;-RM#,##0;RM0" },
+		                { "VND", "₫", "PREFIX", "₫#,##0", "₫#,##0;-₫#,##0;₫0" },
+		                { "PKR", "Rs", "PREFIX", "Rs#,##0", "Rs#,##0;-Rs#,##0;Rs0" },
+		                { "BDT", "৳", "PREFIX", "৳#,##0", "৳#,##0;-৳#,##0;৳0" },
+		                { "LKR", "Rs", "PREFIX", "Rs#,##0", "Rs#,##0;-Rs#,##0;Rs0" },
+		                { "RUB", "₽", "PREFIX", "₽#,##0", "₽#,##0;-₽#,##0;₽0" },
+		                { "UAH", "₴", "PREFIX", "₴#,##0", "₴#,##0;-₴#,##0;₴0" },
+		                { "KZT", "₸", "PREFIX", "₸#,##0", "₸#,##0;-₸#,##0;₸0" },
+		                { "BYN", "Br", "PREFIX", "Br#,##0", "Br#,##0;-Br#,##0;Br0" },
+		                { "UZS", "soʻm", "SUFFIX", "#,##0 soʻm", "#,##0 soʻm;-#,##0 soʻm;0 soʻm" },
+		                { "AZN", "₼", "PREFIX", "₼#,##0", "₼#,##0;-₼#,##0;₼0" },
+		                { "GEL", "₾", "PREFIX", "₾#,##0", "₾#,##0;-₾#,##0;₾0" },
+		                { "AMD", "֏", "PREFIX", "֏#,##0", "֏#,##0;-֏#,##0;֏0" },
+		
+		                -- European currencies
+		                { "SEK", "kr", "SUFFIX", "#,##0 kr", "#,##0 kr;-#,##0 kr;0 kr" },
+		                { "NOK", "kr", "SUFFIX", "#,##0 kr", "#,##0 kr;-#,##0 kr;0 kr" },
+		                { "DKK", "kr", "SUFFIX", "#,##0 kr", "#,##0 kr;-#,##0 kr;0 kr" },
+		                { "PLN", "zł", "SUFFIX", "#,##0 zł", "#,##0 zł;-#,##0 zł;0 zł" },
+		                { "HUF", "Ft", "SUFFIX", "#,##0 Ft", "#,##0 Ft;-#,##0 Ft;0 Ft" },
+		                { "CZK", "Kč", "SUFFIX", "#,##0 Kč", "#,##0 Kč;-#,##0 Kč;0 Kč" },
+		                { "RON", "lei", "SUFFIX", "#,##0 lei", "#,##0 lei;-#,##0 lei;0 lei" },
+		                { "BGN", "лв", "SUFFIX", "#,##0 лв", "#,##0 лв;-#,##0 лв;0 лв" },
+		                { "HRK", "kn", "SUFFIX", "#,##0 kn", "#,##0 kn;-#,##0 kn;0 kn" },
+		                { "ISK", "kr", "SUFFIX", "#,##0 kr", "#,##0 kr;-#,##0 kr;0 kr" },
+		
+		                -- Latin American
+		                { "MXN", "$", "PREFIX", "$#,##0", "$#,##0;-$#,##0;$0" },
+		                { "BRL", "R$", "PREFIX", "R$#,##0", "R$#,##0;-R$#,##0;R$0" },
+		                { "CLP", "$", "PREFIX", "$#,##0", "$#,##0;-$#,##0;$0" },
+		                { "COP", "$", "PREFIX", "$#,##0", "$#,##0;-$#,##0;$0" },
+		                { "ARS", "$", "PREFIX", "$#,##0", "$#,##0;-$#,##0;$0" },
+		                { "PEN", "S/", "PREFIX", "S/#,##0", "S/#,##0;-S/#,##0;S/0" },
+		                { "UYU", "$U", "PREFIX", "$U#,##0", "$U#,##0;-$U#,##0;$U0" },
+		                { "BOB", "Bs", "PREFIX", "Bs#,##0", "Bs#,##0;-Bs#,##0;Bs0" },
+		                { "PYG", "₲", "PREFIX", "₲#,##0", "₲#,##0;-₲#,##0;₲0" },
+		                { "VES", "Bs", "PREFIX", "Bs#,##0", "Bs#,##0;-Bs#,##0;Bs0" },
+		                { "GTQ", "Q", "PREFIX", "Q#,##0", "Q#,##0;-Q#,##0;Q0" },
+		                { "CRC", "₡", "PREFIX", "₡#,##0", "₡#,##0;-₡#,##0;₡0" },
+		                { "DOP", "RD$", "PREFIX", "RD$#,##0", "RD$#,##0;-RD$#,##0;RD$0" },
+		                { "CUP", "$", "PREFIX", "$#,##0", "$#,##0;-$#,##0;$0" },
+		
+		                -- Middle Eastern & African
+		                { "TRY", "₺", "PREFIX", "₺#,##0", "₺#,##0;-₺#,##0;₺0" },
+		                { "ILS", "₪", "PREFIX", "₪#,##0", "₪#,##0;-₪#,##0;₪0" },
+		                { "AED", "AED", "PREFIX", "AED #,##0", "AED #,##0;-AED #,##0;AED 0" },
+		                { "SAR", "SAR", "PREFIX", "SAR #,##0", "SAR #,##0;-SAR #,##0;SAR 0" },
+		                { "QAR", "QR", "PREFIX", "QR #,##0", "QR #,##0;-QR #,##0;QR 0" },
+		                { "KWD", "KD", "PREFIX", "KD #,##0", "KD #,##0;-KD #,##0;KD 0" },
+		                { "BHD", "BD", "PREFIX", "BD #,##0", "BD #,##0;-BD #,##0;BD 0" },
+		                { "OMR", "OMR", "PREFIX", "OMR #,##0", "OMR #,##0;-OMR #,##0;OMR 0" },
+		                { "JOD", "JD", "PREFIX", "JD #,##0", "JD #,##0;-JD #,##0;JD 0" },
+		                { "EGP", "E£", "PREFIX", "E£#,##0", "E£#,##0;-E£#,##0;E£0" },
+		                { "MAD", "MAD", "PREFIX", "MAD #,##0", "MAD #,##0;-MAD #,##0;MAD 0" },
+		                { "ZAR", "R", "PREFIX", "R #,##0", "R #,##0;-R #,##0;R 0" },
+		                { "NGN", "₦", "PREFIX", "₦#,##0", "₦#,##0;-₦#,##0;₦0" },
+		                { "KES", "KSh", "PREFIX", "KSh#,##0", "KSh#,##0;-KSh#,##0;KSh0" },
+		                { "GHS", "GH₵", "PREFIX", "GH₵#,##0", "GH₵#,##0;-GH₵#,##0;GH₵0" },
+		                { "TND", "DT", "PREFIX", "DT #,##0", "DT #,##0;-DT #,##0;DT 0" },
+		                { "ETB", "Br", "PREFIX", "Br#,##0", "Br#,##0;-Br#,##0;Br0" },
+		
+		                -- SpaceParts fictional currencies
+		                { "ARC", "₳", "PREFIX", "₳ #,##0", "₳ #,##0;-₳ #,##0;₳ 0" },
+		                { "BELT", "฿", "PREFIX", "฿ #,##0", "฿ #,##0;-฿ #,##0;฿ 0" },
+		                { "BLO", "Ł", "SUFFIX", "#,##0 Ł", "#,##0 Ł;-#,##0 Ł;0 Ł" },
+		                { "BLT", "₺", "PREFIX", "₺ #,##0", "₺ #,##0;-₺ #,##0;₺ 0" },
+		                { "CAL", "¢", "SUFFIX", "#,##0 ¢", "#,##0 ¢;-#,##0 ¢;0 ¢" },
+		                { "CREDITS", "₡", "PREFIX", "₡ #,##0", "₡ #,##0;-₡ #,##0;₡ 0" },
+		                { "ELD", "Ξ", "SUFFIX", "#,##0 Ξ", "#,##0 Ξ;-#,##0 Ξ;0 Ξ" },
+		                { "HAL", "Ħ", "PREFIX", "Ħ #,##0", "Ħ #,##0;-Ħ #,##0;Ħ 0" },
+		                { "ILOS", "ł", "SUFFIX", "#,##0 ł", "#,##0 ł;-#,##0 ł;0 ł" },
+		                { "LAK", "₭", "PREFIX", "₭ #,##0", "₭ #,##0;-₭ #,##0;₭ 0" },
+		                { "MCR", "₥", "PREFIX", "₥ #,##0", "₥ #,##0;-₥ #,##0;₥ 0" },
+		                { "OTN", "Ø", "PREFIX", "Ø #,##0", "Ø #,##0;-Ø #,##0;Ø 0" },
+		                { "UPN", "Ʉ", "SUFFIX", "#,##0 Ʉ", "#,##0 Ʉ;-#,##0 Ʉ;0 Ʉ" }
+		            }
+		        )
+		
+		    RETURN
+		        _CurrencyTable
+	lineageTag: 37ee43f9-1454-4195-b7ce-cc674b931c90
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 3246243203739DE1CF3E8CB3C02123B186F9D4181353E2AF244EF25FC117EE18
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Get currency format based on currency code
+/// Returns simple currency format string (i.e. $#,##0.0)
+function 'DaxLib.FormatString.Component.GetCurrencyFormat' =
+		
+		// Get currency format based on currency code
+		// Returns simple currency format string (i.e. $#,##0.0)
+		(
+		    // Currency code (ISO 4217 three-letter code)
+		    // Examples: CAD, EUR, GBP, JPY, etc.
+		    currency_code: ANYREF
+		)
+		=>
+		    VAR _Code =
+		        SELECTEDVALUE ( currency_code )
+		
+		    VAR _Currency =
+		        FILTER (
+		            -- Calc. table with common currencies and formats
+		            -- Optionally replace with your own, in-memory exchange rate table
+		            DaxLib.FormatString.Component.CurrencyTable(),
+		            ''[Currency Code] = _Code
+		        )
+		
+		    VAR _Symbol =
+		        SELECTCOLUMNS ( _Currency, ''[Format String] )
+		
+		    RETURN
+		        _Symbol
+	lineageTag: b640aaf4-f10a-4431-b7c8-aab1d78eac94
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 4715B9C25F8A375AA83F66427078173EC87ADDFF0D8B1002D0C85F4EE5CC1A7A
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Get currency format based on currency code
+/// Returns positive; negative; zero format string (i.e. $#,##0.0; ($-#,##0.0); $0)
+function 'DaxLib.FormatString.Component.GetCurrencyFormat.PNZ' =
+		
+		// Get currency format based on currency code
+		// Returns positive; negative; zero format string (i.e. $#,##0.0; ($-#,##0.0); $0)
+		(
+		    // Currency code (ISO 4217 three-letter code)
+		    // Examples: CAD, EUR, GBP, JPY, etc.
+		    currency_code: ANYREF
+		)
+		=>
+		    VAR _Code =
+		        SELECTEDVALUE ( currency_code )
+		
+		    VAR _Currency =
+		        FILTER (
+		            -- Calc. table with common currencies and formats
+		            -- Optionally replace with your own, in-memory exchange rate table
+		            DaxLib.FormatString.Component.CurrencyTable(),
+		            ''[Currency Code] = _Code
+		        )
+		
+		    VAR _Symbol =
+		        SELECTCOLUMNS ( _Currency, ''[Format String PNZ] )
+		
+		    RETURN
+		        _Symbol
+	lineageTag: c98d3080-cb56-445f-b523-3ebfc0d1ae10
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 60F245C67FC30B1810979BCC722FD9F4363927E057E49297A24E50049B644F74
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Simple function to centralize date formats in a model
+/// Main benefit is that if you want to change it, you only have to do it in one place
+/// 
+/// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every Date field.
+function 'DaxLib.FormatString.Basic.Dates' =
+		
+		// Simple function to centralize date formats in a model.
+		// Main benefit is that if you want to change it, you only have to do it in one place.
+		//
+		// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every Date field.
+		() =>
+		    // Replace with one of the other, commented options, below.
+		
+		    -- e.g. 2025-12-25 (ISO 8601 - International Standard)
+		    "yyyy-MM-dd"
+		
+		    -- e.g. 12/25/2025 (Confusing Format)
+		    -- "MM/dd/yyyy"
+		
+		    -- e.g. 25/12/2025 (European/UK Format)
+		    -- "dd/MM/yyyy"
+		
+		    -- e.g. Dec 25, 2025 (Abbreviated Month)
+		    -- "MMM dd, yyyy"
+		
+		    -- e.g. Dec 25, 2025 (Abbreviated Month and Year)
+		    -- "MMM dd, 'yy"
+		
+		    -- e.g. December 25, 2025 (Full Month Name)
+		    -- "MMMM dd, yyyy"
+		
+		    -- e.g. 25-Dec-2025 (Day-Month-Year with Dashes)
+		    -- "dd-MMM-yyyy"
+		
+		    -- e.g. 25 Dec 2025 (Day Month Year with Spaces)
+		    -- "dd MMM yyyy"
+		
+		    -- e.g. Thursday, December 25, 2025 (Full Day and Month Names)
+		    -- "dddd, MMMM DD, yyyy"
+		
+		    -- e.g. Thu, Dec 25, 2025 (Abbreviated Day Name)
+		    -- "ddd, MMM DD, yyyy"
+		
+		    -- e.g. 25.12.2025 (European Format with Dots)
+		    -- "dd.MM.yyyy"
+	lineageTag: 3ac8e2ce-6243-4951-b859-7295a90c00b2
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = F0F63E902CCDF00239A8A5A8B0BCDFE1CD1A6B26754E4380B520E1F4EC3C17B9
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Simple function to centralize month formats in a model
+/// Main benefit is that if you want to change it, you only have to do it in one place
+/// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every Month field.
+function 'DaxLib.FormatString.Basic.Months' =
+		
+		// Simple function to centralize month formats in a model.
+		// Main benefit is that if you want to change it, you only have to do it in one place.
+		//
+		// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every Month field.
+		( ) => "yyyy-MM"
+		
+		    -- e.g. Dec 2025 (Abbreviated Month Year)
+		    -- "MMM yyyy"
+		
+		    -- e.g. December 2025 (Full Month Name with Year)
+		    -- "MMMM yyyy"
+		
+		    -- e.g. 12/2025 (Numeric Month/Year)
+		    -- "MM/yyyy"
+		
+		    -- e.g. 2025/12 (Year/Month for Sorting)
+		    -- "yyyy/MM"
+		
+		    -- e.g. 2025 Dec (Year First with Abbreviated Month)
+		    -- "yyyy MMM"
+		
+		    -- e.g. 2025 M12 (Year with 'M' Month Indicator)
+		    -- Note: quad-quotes necessary to avoid "M" being interpreted as a month number
+		    -- "yyyy" & """" & "M" & """" & "MM"
+		
+		    -- e.g. Dec-25 (Abbreviated Month-Year Short)
+		    -- "MMM-yy"
+		
+		    -- e.g. 12-2025 (Month-Year with Dash)
+		    -- "MM-yyyy"
+		
+		    -- e.g. 2025.12 (Year.Month with Dot)
+		    -- "yyyy.MM"
+	lineageTag: 14d957b1-fa61-4aa1-b64b-ba50aa761072
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 8BAC8C962BCDD5028CAC7D9CBC8EDB09A3D7AE7DDD8850A45B082FAB729AB322
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Simple function to centralize datetime formats in a model.
+/// Main benefit is that if you want to change it, you only have to do it in one place.
+/// 
+/// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every DateTime field.
+function 'DaxLib.FormatString.Basic.DateTimes' =
+		
+		// Simple function to centralize datetime formats in a model.
+		// Main benefit is that if you want to change it, you only have to do it in one place.
+		//
+		// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every DateTime field.
+		( ) => "yyyy-MM-dd HH:mm:ss"
+		
+		    -- e.g. 12/25/2025 2:30 PM (US Format with 12-hour Time)
+		    -- "MM/dd/yyyy h:mm AM/PM"
+		
+		    -- e.g. 25/12/2025 14:30 (European Format with 24-hour Time)
+		    -- "dd/MM/yyyy HH:mm"
+		
+		    -- e.g. Dec 25, 2025 2:30:45 PM (Abbreviated Month with Full Time)
+		    -- "MMM dd, yyyy h:mm:ss AM/PM"
+		
+		    -- e.g. 2025-12-25T14:30:00 (ISO 8601 Standard with T Separator)
+		    -- "yyyy-MM-dd\THH:mm:ss"
+		
+		    -- e.g. 25-Dec-2025 14:30 (Day-Month-Year with Time)
+		    -- "dd-MMM-yyyy HH:mm"
+		
+		    -- e.g. December 25, 2025 at 2:30 PM (Full Month with "at")
+		    -- "MMMM dd, yyyy \a\t h:mm AM/PM"
+		
+		    -- e.g. Thu, Dec 25, 2025 14:30:00 (Abbreviated Day with Full Time)
+		    -- "ddd, MMM dd, yyyy HH:mm:ss"
+		
+		    -- e.g. 2025-12-25 14:30 (Compact ISO Format)
+		    -- "yyyy-MM-dd HH:mm"
+		
+		    -- e.g. 12/25 2:30 PM (Short Format without Year)
+		    -- "MM/dd h:mm AM/PM"
+	lineageTag: c68b058d-01f1-404d-a2cb-7db0546a8bc9
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = A58E212DBB66243AE7E9ECE6319A099D445EAA5434E76235BD0560B5F495D043
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Simple function to centralize quarter formats in a model.
+/// Main benefit is that if you want to change it, you only have to do it in one place.
+/// 
+/// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every Quarter field.
+function 'DaxLib.FormatString.Basic.Quarters' =
+		
+		// Simple function to centralize quarter formats in a model.
+		// Main benefit is that if you want to change it, you only have to do it in one place.
+		//
+		// Recommended: Use a Tabular Editor Macro to assign this function to the format string of every Quarter field.
+		( ) =>
+		    VAR _Q = "Q"
+		    VAR _Qtr = "Qtr"
+		    VAR _FY = "FY"
+		    VAR _Quarter = QUARTER ( SELECTEDMEASURE () )
+		
+		    VAR _Format =
+		        // Replace with one of the other, commented options, below.
+		
+		        -- e.g. 2025 Q4 (Year Quarter - Most Common)
+		        "yyyy " & _Q & _Quarter
+		
+		        -- e.g. Q4 2025 (Quarter Year)
+		        -- _Q  & _Quarter & "yyyy"
+		
+		        -- e.g. 2025-Q4 (Year-Quarter with Dash)
+		        -- "yyyy-" & _Q & _Quarter
+		
+		        -- e.g. Q4/2025 (Quarter/Year with Slash)
+		        -- _Q & _Quarter & "/yyyy"
+		
+		        -- e.g. 2025 Qtr 4 (Year with "Qtr" Abbreviation)
+		        -- "yyyy " & _Qtr & _Quarter
+		
+		        -- e.g. FY2025 Q4 (Fiscal Year Quarter)
+		        -- _FY & "yyyy " & _Q & _Quarter
+		
+		        -- e.g. 25 Q4 (Short Year Quarter)
+		        -- "YY " & _Q & _Quarter
+		
+		        -- e.g. 2025Q4 (Compact Format)
+		        -- "yyyy" & _Q & _Quarter
+		
+		        -- e.g. Q4-25 (Quarter-Short Year)
+		        -- _Q & _Quarter & "-yy"
+		
+		        -- e.g. 4Q 2025 (Number Q Year)
+		        --  _Quarter & _Q & " yyyy"
+		
+		    RETURN
+		        _Format
+	lineageTag: a6d9503e-c8fd-48eb-ad61-c3a02d06a85c
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = D1C3CBC99D1E4DC18E14B117F32EA0963A61F524EEA118CCA23675F379025C0E
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Generic number format function with configurable decimal places.
+/// Centralizes number formatting logic for consistency across the model.
+/// 
+/// Recommended: Use for all numeric measures where decimal precision needs to be standardized.
+function 'DaxLib.FormatString.Basic.Numbers' =
+		
+		// Generic number format function with configurable decimal places.
+		// Centralizes number formatting logic for consistency across the model.
+		//
+		// Recommended: Use for all numeric measures where decimal precision needs to be standardized.
+		( ) => DaxLib.FormatString.Component.DecimalPlaces ( "#,##0", 0 )
+	lineageTag: 3aff3ee1-bb86-4eeb-b2c9-7f8e187d1126
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 8FDF2D5358AC263C322D85466D1C8F5B1964B7F478B7829B4D58302E47D7F7FD
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Generic number format function with configurable decimal places.
+/// Centralizes number formatting logic for consistency across the model.
+/// 
+/// Recommended: Use for all numeric measures where decimal precision needs to be standardized.
+function 'DaxLib.FormatString.Basic.Percents' =
+		
+		// Generic number format function with configurable decimal places.
+		// Centralizes number formatting logic for consistency across the model.
+		//
+		// Recommended: Use for all numeric measures where decimal precision needs to be standardized.
+		( ) => DaxLib.FormatString.Component.DecimalPlaces ( "#,##0", 0 ) & "%"
+	lineageTag: 6281f76d-0e63-4f5d-81b4-28d453716967
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = A7D6A2CA857B427E83CA05B28804AC23C63847E743178CBC52F57EA5D2478871
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Generic number format function with configurable decimal places.
+/// Centralizes number formatting logic for consistency across the model.
+/// 
+/// Recommended: Use in limited scenarios when you want more optimal control over number rounding than what Power BI provides.
+function 'DaxLib.FormatString.Basic.SmarterRounding' =
+		
+		// Generic number format function with configurable decimal places.
+		// Centralizes number formatting logic for consistency across the model.
+		//
+		// Recommended: Use in limited scenarios when you want more optimal control over number rounding than what Power BI provides.
+		( ) => DaxLib.FormatString.Component.DynamicUnits ( "#,##0", SELECTEDMEASURE () )
+	lineageTag: 5e3f9b6c-bacb-4717-a242-1523012a5490
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 6175EB284818E5A81A8363FEC91DCD9DA07F18F0EB6C87D203C8AD84A6027D6E
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Format file sizes with automatic unit detection
+/// Returns human-readable format like "1.2 GB", "512 MB", "2.3 KB"
+function 'DaxLib.FormatString.Basic.FileSize' =
+		
+		// Format file sizes with automatic unit detection
+		// Returns human-readable format like "1.2 GB", "512 MB", "2.3 KB"
+		() =>
+		    VAR _Bytes = ABS( SELECTEDMEASURE () )
+		
+		    VAR _Unit =
+		        SWITCH (
+		            TRUE (),
+		            _Bytes >= 1099511627776, " TB",
+		            _Bytes >= 1073741824, " GB",
+		            _Bytes >= 1048576, " MB",
+		            _Bytes >= 1024, " KB",
+		            " bytes"
+		        )
+		
+		    VAR _Value =
+		        SWITCH (
+		            TRUE (),
+		            _Bytes >= 1099511627776, _Bytes / 1099511627776,
+		            _Bytes >= 1073741824, _Bytes / 1073741824,
+		            _Bytes >= 1048576, _Bytes / 1048576,
+		            _Bytes >= 1024, _Bytes / 1024,
+		            _Bytes
+		        )
+		
+		    VAR _Decimals =
+		        IF ( _Unit = " bytes", 0, 1 )
+		
+		    VAR _FormatString =
+		        IF ( _Decimals = 0, "#,##0", "#,##0.0" )
+		
+		    VAR _Result =
+		        -- Avoids values or units being interpreted as part of the format string
+		        DaxLib.FormatString.Component.MakeStringSafe(
+		            FORMAT ( _Value, _FormatString ) & _Unit
+		        )
+		
+		    RETURN
+		        _Result
+	lineageTag: 2732cd99-ee06-453c-ac9d-df41896e762f
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = BB57363E115B433E5DD82BF5926CDB52A761764AA82528C839BB61A613092A8A
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Format temperature values with unit symbols
+/// Returns formatted temperature like "23.5°C", "75°F"
+/// 
+/// WARNING: Doesn't convert units
+function 'DaxLib.FormatString.Basic.Temperature' =
+		
+		// Format temperature values with unit symbols
+		// Returns formatted temperature like "23.5°C", "75°F"
+		//
+		// WARNING: Doesn't convert units
+		(
+		    // Temperature unit: "C" for Celsius, "F" for Fahrenheit
+		    unit: STRING,
+		
+		    // Number of decimal places (0-2)
+		    decimal_places: INT64
+		) =>
+		    VAR _Unit =
+		        SWITCH (
+		            UPPER( unit ),
+		            "C", "°C",
+		            "F", "°F",
+		            "°"
+		        )
+		
+		    VAR _Format =
+		        DaxLib.FormatString.Component.DecimalPlaces (
+		            "#,##0",
+		            decimal_places
+		        )
+		        & " " & _Unit
+		
+		    RETURN
+		        _Format
+	lineageTag: 347d32aa-8a1c-4003-915c-14ca2010aae8
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 17EAAE0E738696362471B264168030B9C2F378190CA269C98D5BA394463E2A5A
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Convert numbers to ordinal format
+/// Returns ordinal numbers like "1st", "2nd", "3rd", "21st"
+function 'DaxLib.FormatString.Basic.Ordinals' =
+		
+		// Convert numbers to ordinal format
+		// Returns ordinal numbers like "1st", "2nd", "3rd", "21st"
+		() =>
+		    VAR _Num = ABS( SELECTEDMEASURE () )
+		    VAR _LastDigit = MOD( _Num, 10 )
+		    VAR _LastTwoDigits = MOD( _Num, 100 )
+		
+		    VAR _Suffix =
+		        SWITCH (
+		            TRUE (),
+		            _LastTwoDigits >= 11 && _LastTwoDigits <= 13, "th",
+		            _LastDigit = 1, "st",
+		            _LastDigit = 2, "nd",
+		            _LastDigit = 3, "rd",
+		            "th"
+		        )
+		
+		    RETURN
+		       "#,##0" & _Suffix
+	lineageTag: e287203a-245e-4882-a7a0-c24f9bc30484
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 407A36405C03632C3564351448665364AF32C51C7016E4F6CDC9275BE2474674
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Format numbers in scientific notation
+/// Returns scientific notation like "1.23E+06", "4.56E-03"
+function 'DaxLib.FormatString.Basic.Scientific' =
+		
+		// Format numbers in scientific notation
+		// Returns scientific notation like "1.23E+06", "4.56E-03"
+		(
+		    // Number of decimal places (1-15)
+		    decimal_places: INT64
+		) =>
+		    VAR _Decimals = MAX( 1, MIN( decimal_places, 15 ) )
+		    VAR _Notation = "0." & REPT( "0", _Decimals ) & "E+00"
+		    VAR _Format =
+		        DaxLib.FormatString.Component.MakeStringSafe (
+		            FORMAT( SELECTEDMEASURE (), _Notation )
+		        )
+		
+		    RETURN
+		        _Format
+	lineageTag: 45c199f2-1810-4bb9-84e8-2fa537f4cdcb
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 14B29D4F3A1D382D2854B0BC43D83A3CFB73AF6FBA86005C356BCE3126447AC4
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Handle pluralization based on count values
+/// Returns singular or plural forms like "1 item" vs "2 items"
+function 'DaxLib.FormatString.Component.Pluralization' =
+		
+		// Handle pluralization based on count values
+		// Returns singular or plural forms like "1 item" vs "2 items"
+		(
+		    // Count value
+		    count_reference: NUMERIC,
+		
+		    // Singular form (e.g., "item")
+		    singular: STRING,
+		
+		    // Plural form (e.g., "items")
+		    plural: STRING
+		) =>
+		    VAR _Word = IF( ABS( count_reference ) = 1, singular, plural )
+		
+		    RETURN
+		        FORMAT( count_reference, "#,##0" ) & " " & _Word
+	lineageTag: 2719acbd-982a-4f71-a3fe-7a2387ac8cf5
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = EEACD5197931E1F1AEA252F364E675F8BBBEF3A20ECFB8708E3F59FDC1BC980B
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Convert decimals to simple fractions
+/// Returns fractions like "1/2", "3/4", "2 1/3"
+function 'DaxLib.FormatString.Basic.Fractions' =
+		
+		// Convert decimals to simple fractions
+		// Returns fractions like "1/2", "3/4", "2 1/3"
+		() =>
+		    VAR _WholeNumber = INT( SELECTEDMEASURE () )
+		    VAR _DecimalPart = SELECTEDMEASURE () - _WholeNumber
+		
+		    VAR _CommonFractions =
+		        SWITCH (
+		            TRUE (),
+		            ABS( _DecimalPart - 0.5 ) < 0.01, "1/2",
+		            ABS( _DecimalPart - 0.25 ) < 0.01, "1/4",
+		            ABS( _DecimalPart - 0.75 ) < 0.01, "3/4",
+		            ABS( _DecimalPart - 0.33333 ) < 0.01, "1/3",
+		            ABS( _DecimalPart - 0.66667 ) < 0.01, "2/3",
+		            ABS( _DecimalPart - 0.125 ) < 0.01, "1/8",
+		            ABS( _DecimalPart - 0.375 ) < 0.01, "3/8",
+		            ABS( _DecimalPart - 0.625 ) < 0.01, "5/8",
+		            ABS( _DecimalPart - 0.875 ) < 0.01, "7/8",
+		            FORMAT( _DecimalPart, "0.00" )
+		        )
+		
+		    RETURN
+		        IF ( _WholeNumber = 0,
+		            _CommonFractions,
+		            FORMAT( _WholeNumber, "#,##0" ) &
+		            IF ( _DecimalPart <> 0, " " & _CommonFractions, "" )
+		        )
+	lineageTag: d281f06c-e8c6-4ad2-bfbd-b2dd04026736
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 6026FE93DD2D0F79D360C11EFF15EB0C36E3937D20169B01DDC118B59828D883
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Convert numbers to Roman numerals
+/// Returns Roman numerals like "I", "II", "III", "IV", "V", "X", "L", "C", "M"
+function 'DaxLib.FormatString.Basic.RomanNumerals' =
+		
+		// Convert numbers to Roman numerals
+		// Returns Roman numerals like "I", "II", "III", "IV", "V", "X", "L", "C", "M"
+		() =>
+		    VAR _Num = MAX( 1, MIN( 3999, ABS( SELECTEDMEASURE () ) ) )
+		
+		    VAR _Thousands = INT( _Num / 1000 )
+		    VAR _Hundreds = INT( MOD( _Num, 1000 ) / 100 )
+		    VAR _Tens = INT( MOD( _Num, 100 ) / 10 )
+		    VAR _Ones = MOD( _Num, 10 )
+		
+		    VAR _ThousandsRoman = REPT( "M", _Thousands )
+		
+		    VAR _HundredsRoman =
+		        SWITCH ( _Hundreds, 1, "C", 2, "CC", 3, "CCC", 4, "CD", 5, "D", 6, "DC", 7, "DCC", 8, "DCCC", 9, "CM", "" )
+		
+		    VAR _TensRoman =
+		        SWITCH ( _Tens, 1, "X", 2, "XX", 3, "XXX", 4, "XL", 5, "L", 6, "LX", 7, "LXX", 8, "LXXX", 9, "XC", "" )
+		
+		    VAR _OnesRoman =
+		        SWITCH ( _Ones, 1, "I", 2, "II", 3, "III", 4, "IV", 5, "V", 6, "VI", 7, "VII", 8, "VIII", 9, "IX", "" )
+		
+		    VAR _FormatString =
+		        DaxLib.FormatString.Component.MakeStringSafe (
+		            _ThousandsRoman &
+		            _HundredsRoman &
+		            _TensRoman &
+		            _OnesRoman
+		        )
+		
+		    RETURN
+		        _FormatString
+	lineageTag: b93ef48d-7fac-45e8-bd27-b14f8b8e77dd
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = D655F3A5C002F71736102485B780C45171FBAE97D07C5CD67F106561EB2B6B86
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 1
+
+/// Retrieve the first date in dateColumnn where there is a transaction in dateTransaction
+/// it can replace FIRSTNONBLANKVALUE when we can assume that the expression is not blank
+/// if there is a transaction (in the table that has dateTransaction) for the same date
+/// @param {expr} dateColumn - The date to filter, it is usually the Date column in the Date table
+/// @param {expr} dateTransaction - The date column in the transaction table
+/// @return Table with the filtered date in dateColumn
+function 'DaxLib.Filtering.FirstDateWithTransactions' = ```
+		( 
+		    // The date to filter, it is usually the Date column in the Date table
+		    dateColumn : ANYREF EXPR,  
+		
+		    // The date column in the transaction table
+		    dateTransaction : ANYREF EXPR
+		) => 
+		VAR FirstVisibleDate = MIN ( dateColumn )
+		VAR FirstDateWithData = 
+		    CALCULATE ( 
+		        MIN ( dateTransaction ), 
+		        KEEPFILTERS ( dateColumn >= FirstVisibleDate ) 
+		    )
+		RETURN TREATAS ( { FirstDateWithData }, dateColumn )
+		```
+	lineageTag: 660a532a-9d54-4489-850d-1660dc107a35
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 234E3D3BBA6451262423B5632EBE3BF321B5B7987A41963CCAC93A576351DBA5
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 2
+
+/// Return the value of the expression evaluated in the first date where there are transactions
+/// @param {expr} valueExpr - Expression to evaluate in the first transaction by dateTransaction
+/// @param {expr} dateColumn - The date to filter, it is usually the Date column in the Date table
+/// @param {expr} dateTransaction - The date column in the transaction table
+/// @return The result of valueExpr in the first date with a transaction in dateTransaction
+function 'DaxLib.Filtering.FirstValue' = ```
+		( 
+		    // Expression to evaluate for the first date with a transaction; its result is returned by this function
+		    valueExpr : ANYREF EXPR,
+		
+		    // THe date to filter, it is usually the Date column in the Date table
+		    dateColumn : ANYREF EXPR,  
+		
+		    // The date column in the transaction table
+		    dateTransaction : ANYREF EXPR
+		) => 
+		CALCULATE (
+		    valueExpr,
+		    DaxLib.Filtering.FirstDateWithTransactions ( dateColumn, dateTransaction )
+		)
+		```
+	lineageTag: 879a6462-8f9c-4f53-a449-5ca1616d78dd
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = D54AD00BD9DBDFA5FB04759ED0B2EF5DDF92E1938C93D0C24ADB0E42303E445B
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 2
+
+/// Retrieve the last date in dateColumnn where there is a transaction in dateTransaction
+/// it can replace FIRSTNONBLANKVALUE when we can assume that the expression is not blank
+/// if there is a transaction (in the table that has dateTransaction) for the same date
+/// @param {expr} dateColumn - The date to filter, it is usually the Date column in the Date table
+/// @param {expr} dateTransaction - The date column in the transaction table
+/// @return Table with the filtered date in dateColumn
+function 'DaxLib.Filtering.LastDateWithTransactions' = ```
+		( 
+		    // THe date to filter, it is usually the Date column in the Date table
+		    dateColumn : ANYREF EXPR,  
+		
+		    // The date column in the transaction table
+		    dateTransaction : ANYREF EXPR
+		) => 
+		VAR LastVisibleDate = MAX ( dateColumn )
+		VAR LastDateWithData = 
+		    CALCULATE ( 
+		        MAX ( dateTransaction ), 
+		        KEEPFILTERS ( dateColumn <= LastVisibleDate ) 
+		    )
+		RETURN TREATAS ( { LastDateWithData }, dateColumn )
+		```
+	lineageTag: 981116a8-3fcd-4618-8990-1b86aac3cba6
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 647412615811ED07E177D11FF606CCE4BDE6AE30B9232466C1D17FF8E57B50E2
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 2
+
+/// Return the value of the expression evaluated in the last date where there are transactions
+/// @param {expr} valueExpr - Expression to evaluate in the last transaction by dateTransaction
+/// @param {expr} dateColumn - The date to filter, it is usually the Date column in the Date table
+/// @param {expr} dateTransaction - The date column in the transaction table
+/// @return The result of valueExpr in the last date with a transaction in dateTransaction
+function 'DaxLib.Filtering.LastValue' = ```
+		( 
+		    // Expression to evaluate for the last date with a transaction; its result is returned by this function
+		    valueExpr : ANYREF EXPR,
+		
+		    // THe date to filter, it is usually the Date column in the Date table
+		    dateColumn : ANYREF EXPR,  
+		
+		    // The date column in the transaction table
+		    dateTransaction : ANYREF EXPR
+		) => 
+		CALCULATE (
+		    valueExpr,
+		    DaxLib.Filtering.LastDateWithTransactions ( dateColumn, dateTransaction )
+		)
+		```
+	lineageTag: bfdf73bd-eb45-4dee-8851-e180c7b59637
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 31888027231F303758049F599258E041C4296AB08C09041EE32D4FE1B1751609
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 2
+
+/// Search a value in a lookupDate that has min/max columns and a target column containing the value to return
+/// @param {value} searchValue - Number or string to find between minColumn and maxColumn in lookupTable
+/// @param {expr} lookupTable - Table to scan to search the value containing minColumn, maxColumn, and targetColumn
+/// @param {expr} minColumn - Must be included in lookupTable, and it is the minimum boundary of the range, included
+/// @param {expr} maxColumn - Must be included in lookupTable, and it is the maximum boundary of the range, excluded
+/// @param {expr} targetColumn - Column target in lookupTable; the value for the row found is returned by this function
+/// @return The value of targetColumn for the matching row
+function 'DaxLib.Filtering.RangeLookup' = ```
+		( 
+		    // Number or string to find between minColumn and maxColumn in lookupTable
+		    searchValue   : SCALAR VAL,
+		
+		    // Table to scan to search the value containing minColumn, maxColumn, and targetColumn
+		    lookupTable   : ANYREF EXPR, 
+		
+		    // minColumn must be included in lookupTable, and it is the minimum boundary of the range, included
+		    minColumn     : ANYREF EXPR, 
+		    
+		    // maxColumn must be included in lookupTable, and it is the maximum boundary of the range, excluded
+		    maxColumn     : ANYREF EXPR, 
+		
+		    /// Column target in lookupTable; the value for the row found is returned by this function 
+		    targetColumn  : ANYREF EXPR 
+		) => 
+		    SELECTCOLUMNS (
+		        FILTER (
+		            lookupTable,
+		            minColumn <= searchValue && maxColumn > searchValue
+		        ),
+		        "@Result", targetColumn
+		    )
+		```
+	lineageTag: 2fe9199a-f7a6-445f-9f58-8d945cd0075b
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 8C1125C222052D6979FC5C1C8223DDDBECF39073AEEC9E1AB1548E07C3A97303
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 2
+
+/// Returns a simple moving average (SMA) of the expression calculated along N number of periods.
+function 'TimeSeries.MovingAverage.Simple' = ```
+		( 
+		    dateColumn : ANYREF EXPR, 
+		    timeSeriesTable: ANYREF EXPR,
+		    lookbackPeriods : SCALAR INT64, 
+		    expression : NUMERIC EXPR ) =>
+		VAR _Window = 
+		    CALCULATETABLE( 
+		        WINDOW( -(lookbackPeriods - 1), REL, 0, REL, SUMMARIZE ( ALL ( timeSeriesTable ), dateColumn ), ORDERBY( dateColumn, ASC ) ), 
+		        LASTNONBLANK( dateColumn, expression )
+		    )
+		RETURN
+		    AVERAGEX( _Window, expression )
+		```
+	lineageTag: e423d817-7475-4fb6-8977-301ed27087bd
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 21AF551C2CCE977F02F27303DDC7794E8EB37870774CB204C15E1A7BC8BB1CD3
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 4
+
+/// Returns a weighted moving average (WMA) of the weighted expression calculated along N number of periods.
+function 'TimeSeries.MovingAverage.Weighted' = ```
+		( 
+		    dateColumn : ANYREF EXPR, 
+		    timeSeriesTable: ANYREF EXPR,
+		    lookbackPeriods : SCALAR INT64, 
+		    expression : NUMERIC EXPR,
+		    weightExpression: NUMERIC EXPR ) =>
+		VAR _Window = 
+		    CALCULATETABLE(
+		        WINDOW( -(lookbackPeriods - 1), REL, 0, REL, SUMMARIZE ( ALL ( timeSeriesTable ), dateColumn ), ORDERBY( dateColumn, ASC ) ),
+		        LASTNONBLANK( dateColumn, expression )
+		    )
+		VAR _Numerator = SUMX( _Window, expression * weightExpression )
+		VAR _Denominator = SUMX( _Window, weightExpression )
+		RETURN
+		    DIVIDE( _Numerator, _Denominator )
+		```
+	lineageTag: 8060d444-6e24-4b8d-92b9-ff92ba39f306
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 32F2040E570735BF4C4CA16B0A77BF96C1A3924CD8F8B75663850AEBBB1332CC
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 4
+
+function 'TimeSeries.MovingAverage.LinearWeighted' = ```
+		( 
+		    dateColumn : ANYREF EXPR, 
+		    timeSeriesTable: ANYREF EXPR,
+		    lookbackPeriods : SCALAR INT64, 
+		    expression : NUMERIC EXPR ) =>
+		VAR _Window = CALCULATETABLE( WINDOW( -(lookbackPeriods - 1), REL, 0, REL, SUMMARIZE( ALL( timeSeriesTable ), dateColumn ), ORDERBY( dateColumn, ASC ) ), LASTNONBLANK( dateColumn, expression ) )
+		VAR _IndexedWindow = ADDCOLUMNS( _Window, "@Index", ROWNUMBER( _Window, ORDERBY( dateColumn, ASC ) ) )
+		RETURN 
+		    DIVIDE( 
+		        SUMX( _IndexedWindow, expression * [@Index] ),
+		        SUMX( _IndexedWindow, [@Index] )
+		    )
+		```
+	lineageTag: ece61b73-378e-4ca0-9354-a68ffdb26063
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 82D7816188A9C72A3E1590D70A9656A67F3A05BECBF9819A224930C65EC7E2E5
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 4
+
+/// Returns an exponentially weighted moving average (EMA or EWMA) of the expression calculated along N number of periods.
+function 'TimeSeries.MovingAverage.Exponential' = ```
+		( 
+		    dateColumn : ANYREF EXPR, 
+		    timeSeriesTable: ANYREF EXPR,
+		    lookbackPeriods : SCALAR INT64, 
+		    expression : NUMERIC EXPR ) =>
+		VAR _NewLookback = lookbackPeriods * 12 // Increase the lookback for the exponential weighting enough so that the decimals become irrelevant.
+		VAR _Window = 
+		    CALCULATETABLE( 
+		        WINDOW( -_NewLookback, REL, 0, REL, SUMMARIZE ( ALL ( timeSeriesTable ), dateColumn ), ORDERBY( dateColumn, ASC ) ),
+		        LASTNONBLANK( dateColumn, expression )
+		    )
+		VAR _IndexedWindow = ADDCOLUMNS( _Window, "@Index", ROWNUMBER( _Window, ORDERBY( dateColumn, DESC ) ) - 1 )
+		VAR _SmoothingFactor = DIVIDE ( 2, lookbackPeriods + 1 )
+		RETURN
+		    // Exponentially weight expression
+		    SUMX( _IndexedWindow, expression * _SmoothingFactor * POWER( 1 - _SmoothingFactor, [@Index] ) ) + 
+		    // Fix beginning of time series due to exponential weighting.
+		    SUMX( INDEX( 1, _IndexedWindow), expression * _SmoothingFactor * POWER( 1 - _SmoothingFactor, [@Index] ) * DIVIDE(lookbackPeriods - 1, 2) )
+		```
+	lineageTag: 8319a68a-0727-4d43-b41c-adcb9b372f7a
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 2D41B4908432500507F4E95DAA87F153AB839CAEB8266B4EF6565E28502C9A36
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 4
+
+/// Returns a double exponential moving average (DEMA) of the expression calculated along N number of periods.
+function 'TimeSeries.MovingAverage.DoubleExponential' = ```
+		( 
+		    dateColumn : ANYREF EXPR, 
+		    timeSeriesTable: ANYREF EXPR,
+		    lookbackPeriods : SCALAR INT64, 
+		    expression : NUMERIC EXPR ) =>
+		VAR _NewLookback = lookbackPeriods * 12 // Increase the lookback for the exponential weighting enough so that the decimals become irrelevant. A multiplier of 12 corrects out to 10 decimal places.
+		VAR _Window = 
+		    CALCULATETABLE(
+		        WINDOW( -_NewLookback, REL, 0, REL, SUMMARIZE ( ALL ( timeSeriesTable ), dateColumn ), ORDERBY( dateColumn, ASC ) ),
+		        LASTNONBLANK( dateColumn, expression )
+		    )
+		VAR _IndexedWindow = ADDCOLUMNS( _Window, "@Index", ROWNUMBER( _Window, ORDERBY( dateColumn, DESC ) ) - 1 )
+		VAR _SmoothingFactor =
+		    DIVIDE ( 2, lookbackPeriods + 1 )
+		VAR _EWMAWindow = ADDCOLUMNS( _IndexedWindow, "EWMA", TimeSeries.MovingAverage.Exponential( dateColumn, timeSeriesTable, lookbackPeriods, expression ) )
+		RETURN
+		    ( 2 * TimeSeries.MovingAverage.Exponential( dateColumn, timeSeriesTable, lookbackPeriods, expression ) ) -
+		    ( SUMX( _EWMAWindow, [EWMA] * _SmoothingFactor * POWER( 1 - _SmoothingFactor, [@Index] ) ) +
+		    SUMX( INDEX( 1, _EWMAWindow), [EWMA] * _SmoothingFactor * POWER( 1 - _SmoothingFactor, [@Index] ) * DIVIDE(lookbackPeriods - 1, 2) ) )
+		```
+	lineageTag: 2eeb5991-f30a-4e66-9ecf-637b36cb2ea7
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = A77BE391A2DD151A73F7361B94B96AEBB50B928DFDA0EC51A39DE2A4FD093913
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 4
+
+/// Returns a triangularly weighted moving average (TWMA) of the weighted expression calculated along N number of periods.
+function 'TimeSeries.MovingAverage.Triangular' = ```
+		( 
+		    dateColumn : ANYREF EXPR, 
+		    timeSeriesTable: ANYREF EXPR,
+		    lookbackPeriods : SCALAR INT64, 
+		    expression : NUMERIC EXPR ) =>
+		VAR _Window = 
+		    CALCULATETABLE(
+		        WINDOW( -(lookbackPeriods - 1), REL, 0, REL, SUMMARIZE( ALL( timeSeriesTable ), dateColumn ), ORDERBY( dateColumn, ASC ) ),
+		        LASTNONBLANK( dateColumn, expression )
+		    )
+		RETURN 
+		    AVERAGEX( ADDCOLUMNS( _Window, "SMA", TimeSeries.MovingAverage.Simple( dateColumn, timeSeriesTable, lookbackPeriods, expression )), [SMA] )
+		```
+	lineageTag: 29438d41-de5b-4ddf-92de-751247828156
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = E4CF42C5E1C11C37FE6B4A56F35CC1AC6C088F483B9A0173132E9B7CAF5F0335
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 4
+
+/// Returns a geometric moving average (GMA) of the expression calculated along N number of periods.
+function 'TimeSeries.MovingAverage.Geometric' = ```
+		( 
+		    dateColumn : ANYREF EXPR, 
+		    timeSeriesTable: ANYREF EXPR,
+		    lookbackPeriods : SCALAR INT64, 
+		    expression : NUMERIC EXPR ) =>
+		VAR _Window = 
+		    CALCULATETABLE( 
+		        WINDOW( -(lookbackPeriods - 1), REL, 0, REL, SUMMARIZE ( ALL ( timeSeriesTable ), dateColumn ), ORDERBY( dateColumn, ASC ) ),
+		        LASTNONBLANK( dateColumn, expression )
+		    )
+		RETURN
+		    GEOMEANX( _Window, expression )
+		```
+	lineageTag: 3f6cda9d-8c1a-4feb-bce8-63ef242d427f
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = BCADA2DC39BE3A30AFBB9B633E26778CAD9C3D4455164CFCB3D08749BCB15A0A
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 4
+
+/// Return the value computed in the filtered ABC classes
+/// Implement Dynamic ABC Classification pattern from DAX Patterns
+/// Article: https://www.daxpatterns.com/abc-classification/
+/// You must have a table with the definition of
+/// the ABC classes (abcClassTable) with at least two columns,
+/// the lower and the upper boundary of each class
+/// The first argument is the expression to evaluate for each
+/// ite in itemTable, which cardinality is expressed by itemKeyColumn
+/// The transactionTable is the table that defines the presence of
+/// transactions, typically the table that has the column(s)
+/// aggregated in valueExpr
+function 'DaxPatterns.AbcClassification.ComputeInAbcClass' = ```
+		( 
+		    valueExpr : ANYREF EXPR, 
+		    transactionsTable : ANYREF EXPR, 
+		    itemTable : ANYREF EXPR, 
+		    itemKeyColumn : ANYREF EXPR,
+		    abcClassTable : ANYREF EXPR,
+		    abcLowerBoundaryColumn : ANYREF EXPR,
+		    abcUpperBoundaryColumn : ANYREF EXPR
+		) =>
+		    VAR ProductsInClass = 
+		        DaxPatterns.AbcClassification.ItemsInClass( 
+		            valueExpr,
+		            TransactionsTable, 
+		            ItemTable, 
+		            ItemKeyColumn, 
+		            abcClassTable,
+		            abcLowerBoundaryColumn,
+		            abcUpperBoundaryColumn 
+		        ) 
+		    VAR Result =
+		        CALCULATE (           
+		            valueExpr,
+		            KEEPFILTERS ( ProductsInClass )
+		        )
+		    RETURN Result
+		```
+	lineageTag: 5a92e57a-2623-4fa3-8b60-7eb3d9c9fe7a
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 708F628B380F4C39F5565053364EE27912E52FA33D5AE58D65D8D12B1D9E4AE1
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 5
+
+/// Return the items filtered by ABC classes
+/// Implement Dynamic ABC Classification pattern from DAX Patterns
+/// Article: https://www.daxpatterns.com/abc-classification/
+/// You must have a table with the definition of
+/// the ABC classes (abcClassTable) with at least two columns,
+/// the lower and the upper boundary of each class
+/// The first argument is the expression to evaluate for each
+/// ite in itemTable, which cardinality is expressed by itemKeyColumn
+/// The transactionTable is the table that defines the presence of
+/// transactions, typically the table that has the column(s)
+/// aggregated in valueExpr
+function 'DaxPatterns.AbcClassification.ItemsInClass' = ```
+		( 
+		    valueExpr : ANYREF EXPR,
+		    transactionsTable : ANYREF EXPR, 
+		    itemTable : ANYREF EXPR, 
+		    itemKeyColumn : ANYREF EXPR, 
+		    abcClassTable : ANYREF EXPR,
+		    abcLowerBoundaryColumn : ANYREF EXPR,
+		    abcUpperBoundaryColumn : ANYREF EXPR
+		) => 
+		    VAR TransactionsByItem = 	
+		        CALCULATETABLE (
+		            ADDCOLUMNS (
+		                SUMMARIZE ( transactionsTable, itemKeyColumn ),
+		                "@Value", CALCULATE ( valueExpr )
+		            ),
+		            ALLSELECTED ( itemTable )
+		        )
+		    VAR AllItemsValue =
+		        SUMX ( 
+		            transactionsByItem,
+		            [@Value]
+		        )
+		    VAR CumulatedPctByItemTable = 
+		        ADDCOLUMNS ( 
+		            transactionsByItem, 
+		            "@CumulatedPct", 
+		                VAR CumulatedValue = 
+		                    SUMX ( 
+		                        WINDOW ( 
+		                            1, ABS, 
+		                            0, REL, 
+		                            transactionsByItem, 
+		                            ORDERBY ( [@Value], DESC ) 
+		                        ), 
+		                        [@Value] 
+		                    )
+		                VAR Perc = 
+		                    DIVIDE (
+		                        CumulatedValue,
+		                        AllItemsValue
+		                    )
+		                RETURN
+		                    MIN ( Perc, 1 ) -- Avoid >100% in case of rounding issues
+		        )
+		    
+		    VAR Result =
+		        FILTER (
+		            CROSSJOIN (
+		                CumulatedPctByItemTable,
+		                abcClassTable
+		            ),
+		            AND (
+		                [@CumulatedPct] > abcLowerBoundaryColumn,
+		                [@CumulatedPct] <= abcUpperBoundaryColumn
+		            )
+		        )
+		    RETURN Result
+		```
+	lineageTag: 75821450-2597-45b0-86f3-970b0b6d6e79
+
+	extendedProperty TabularEditor_ObjDaxPkgContentHash = 44802C37331275CE25D5791A815BA8C42ACF0E1E78FC58CE1428A285B421A2C6
+
+	extendedProperty TabularEditor_ObjDaxPkgHandle = 5
+

@@ -1,0 +1,134 @@
+cultureInfo en-US
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "table_helpers.label__footer_user": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Helpers",
+			          "ConceptualProperty": "Label - Footer user"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "User": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_helpers.label__footer_period": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Helpers",
+			          "ConceptualProperty": "Label - Footer period"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Selected accounting period": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_helpers.label__footer_last_date": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Helpers",
+			          "ConceptualProperty": "Label - Footer last date"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Last accounting period": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_helpers.label__footer_company": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Helpers",
+			          "ConceptualProperty": "Label - Footer company"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Selected company": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_helpers.label__footer_accounting_period": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Helpers",
+			          "ConceptualProperty": "Label - Footer accounting period"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Selected accounting period": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "table_report_info.data_model_description": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Report Info",
+			          "ConceptualProperty": "Data model description"
+			        }
+			      },
+			      "State": "Generated"
+			    },
+			    "table_report_info.report_overview": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "_Report Info",
+			          "ConceptualProperty": "Report overview"
+			        }
+			      },
+			      "State": "Generated"
+			    }
+			  }
+			}
+		contentType: json
+

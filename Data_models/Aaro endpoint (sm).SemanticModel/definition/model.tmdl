@@ -1,0 +1,111 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: sv-SE
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+/// Contains the base connection queries for all external data sources (databases, files, APIs, etc.). Each source query provides a single, well-defined entry point for credentials, paths, and privacy levels before transformation logic is applied in staging. Queries are named src_<source>_<entity>.
+queryGroup '3. Source'
+
+	annotation PBI_QueryGroupOrder = 2
+
+/// Contains the final curated queries that are loaded into the Power BI data model. These represent dimension and fact tables following a star schema, optimized for relationships, DAX measures, and performance within the semantic layer. Queries have no prefix and use the final business name (Title Case).
+queryGroup '5. Load to Data Model'
+
+	annotation PBI_QueryGroupOrder = 4
+
+/// Holds intermediate queries that perform data cleansing, type conversions, and structural transformations. These queries prepare the data for modeling but are not loaded to the data model directly. Queries are named stg_<entity>.
+queryGroup '4. Stage'
+
+	annotation PBI_QueryGroupOrder = 3
+
+queryGroup '5. Load to Data Model\Fact Tables'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup '5. Load to Data Model\Dimension Tables'
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup '5. Load to Data Model\Disconnected Tables'
+
+	annotation PBI_QueryGroupOrder = 2
+
+/// Stores custom Power Query M functions used across multiple queries. These encapsulate logic such as data transformations, API calls, or dynamic filtering into reusable components, improving readability and reducing code duplication. Functions are named fn_<purpose>.
+queryGroup '2. Functions'
+
+	annotation PBI_QueryGroupOrder = 1
+
+/// Contains reusable parameter queries that define dynamic values such as date ranges, environment paths, file locations, and configuration flags. Parameters are referenced throughout other queries to maintain consistency and simplify maintenance when source paths or logic need to change. Parameters are named p_<name>.
+queryGroup '1. Parameters'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup '1. Parameters\1.1 Connection parameters'
+
+	annotation PBI_QueryGroupOrder = 0
+
+queryGroup '3. Source\3.2 Other'
+
+	annotation PBI_QueryGroupOrder = 1
+
+queryGroup '1. Parameters\1.2 Parameters'
+
+	annotation PBI_QueryGroupOrder = 1
+
+extendedProperty TabularEditor_ModelDaxPkgSeq = 6
+
+extendedProperty TabularEditor_ModelDaxPkgTable =
+		{
+		  "1": {
+		    "Provider": "https://api.daxlib.org",
+		    "PackageId": "DaxLib.FormatString",
+		    "Version": "0.1.2"
+		  },
+		  "2": {
+		    "Provider": "https://api.daxlib.org",
+		    "PackageId": "DaxLib.Filtering",
+		    "Version": "0.1.2"
+		  },
+		  "3": {
+		    "Provider": "https://api.daxlib.org",
+		    "PackageId": "EveryDay.KpiCalcs",
+		    "Version": "0.1.2-beta"
+		  },
+		  "4": {
+		    "Provider": "https://api.daxlib.org",
+		    "PackageId": "TimeSeries.MovingAverage",
+		    "Version": "0.1.1"
+		  },
+		  "5": {
+		    "Provider": "https://api.daxlib.org",
+		    "PackageId": "DaxPatterns.AbcClassification",
+		    "Version": "0.1.3"
+		  }
+		}
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["p_datawarehouse_server_host_name","p_sql_endpoint_server_host_name","p_sharepoint_site_root_path","p_sharepoint_folder_path","p_analytics_metadata_site_root_path","p_null_member_string","p_environment_manual","p_report_name","p_semantic_model_name","src_aaro_integration_fact_gl_balance_snapshot","src_excel_rls_gfo_aaro_access","src_sharepoint_analytics_environment","src_sharepoint_analytics_report_info","stg_analytics_environment","GL Balance Snapshots*","_RLS Company Access","_Environment","_Helpers","__Metrics","_Report Info"]
+
+annotation PBI_ProTooling = ["DevMode","TMDLView_Desktop"]
+
+annotation __TEdtr = 1
+
+annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_MODEL_DATE_TABLE_MARKED"]}
+
+ref table __Metrics
+ref table '_Metric Info'
+ref table _Helpers
+ref table 'GL Balance Snapshots*'
+ref table '_RLS Company Access'
+ref table '_Report Info'
+ref table _Environment
+
+ref role 'Company access'
+
+ref cultureInfo en-US
+

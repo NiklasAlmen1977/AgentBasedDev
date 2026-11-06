@@ -1,0 +1,50 @@
+/// Access list for row-level security: which company codes each user (UPN) may see in GL Balance Snapshots*. Company code ALL gives access to all companies. Maintained in tbl_rls_gfo_aaro_access; used only by the Company access role.
+table '_RLS Company Access'
+	isHidden
+	lineageTag: 9d4c7a1e-2f6b-4b8d-a3e5-6c0f1b7d2e94
+
+	/// User principal name (work account), lowercase. From the column Contact 1.
+	column UPN
+		dataType: string
+		isHidden
+		lineageTag: 0e7b3c5d-8a2f-4f61-9c4e-b5d1a6f8e273
+		summarizeBy: none
+		sourceColumn: UPN
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Company code the user may see, or ALL for all companies.
+	column 'Company code'
+		dataType: string
+		isHidden
+		lineageTag: 5a2d9f6b-1c4e-4a7b-8e3f-2b6d0c9a4f18
+		summarizeBy: none
+		sourceColumn: Company code
+
+		annotation SummarizationSetBy = Automatic
+
+	partition '_RLS Company Access' = m
+		mode: import
+		queryGroup: '5. Load to Data Model\Disconnected Tables'
+		source =
+				let
+				    Source = src_excel_rls_gfo_aaro_access,
+				    Select_Columns = Table.SelectColumns(Source, {"Contact 1", "Company code"}),
+				    Rename_Columns = Table.RenameColumns(Select_Columns, {{"Contact 1", "UPN"}}),
+				    // UPN in lowercase, so it matches LOWER( USERPRINCIPALNAME( ) ) in the role
+				    Clean_Values = Table.TransformColumns(
+				        Rename_Columns,
+				        {
+				            {"UPN", each Text.Lower(Text.Trim(Text.From(_))), type text},
+				            {"Company code", each Text.Trim(Text.From(_)), type text}
+				        }
+				    ),
+				    Remove_Blanks = Table.SelectRows(Clean_Values, each [UPN] <> null and [UPN] <> "" and [Company code] <> null and [Company code] <> ""),
+				    Remove_Duplicates = Table.Distinct(Remove_Blanks)
+				in
+				    Remove_Duplicates
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

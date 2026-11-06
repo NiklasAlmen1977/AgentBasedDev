@@ -1,0 +1,176 @@
+/// Report metadata from the Analytics Report Info list on the Group Analytics metadata SharePoint site (the row for p_report_name or p_semantic_model_name), shown on the Definition page. Maintain the values in the list, not in the model.
+table '_Report Info'
+	isHidden
+	lineageTag: 7d937545-6493-4cf1-816d-0813ea7d1d12
+
+	column 'Report owner'
+		dataType: string
+		isHidden
+		lineageTag: 60b3e9e7-74b9-4d4e-8c91-9fed5fd948d9
+		summarizeBy: none
+		sourceColumn: Report owner
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Target owner'
+		dataType: string
+		isHidden
+		lineageTag: 4264fa0f-8e1d-493e-b835-b77b156b6847
+		summarizeBy: none
+		sourceColumn: Target owner
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	/// Report name in the list, used to select this row.
+	column Report
+		dataType: string
+		isHidden
+		lineageTag: 30311972-3b21-412e-83bd-81df8e0f0289
+		summarizeBy: none
+		sourceColumn: Report
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	/// Semantic model name in the list, used to select this row.
+	column 'Semantic model'
+		dataType: string
+		isHidden
+		lineageTag: 47d0ecf3-4d3c-4a68-81c5-ef0565f43c4c
+		summarizeBy: none
+		sourceColumn: Semantic model
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Report refresh frequency'
+		dataType: string
+		isHidden
+		lineageTag: 8d9cbede-da8e-4527-b6d6-df363ea822d2
+		summarizeBy: none
+		sourceColumn: Report refresh frequency
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Report overview'
+		dataType: string
+		isHidden
+		lineageTag: ba2b9c38-3ef9-4de8-aff3-89f912c66e31
+		summarizeBy: none
+		sourceColumn: Report overview
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Data model description'
+		dataType: string
+		isHidden
+		lineageTag: ae5d2557-4dfd-4390-a687-5350c8937471
+		summarizeBy: none
+		sourceColumn: Data model description
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Refinement needed?'
+		dataType: string
+		isHidden
+		lineageTag: ae1f0a8e-91c0-4446-9e9f-9611e30552f2
+		summarizeBy: none
+		sourceColumn: Refinement needed?
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Found error?'
+		dataType: string
+		isHidden
+		lineageTag: 953d7e64-bf2c-4158-8537-d573458ba8fa
+		summarizeBy: none
+		sourceColumn: Found error?
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Developer responsible'
+		dataType: string
+		isHidden
+		lineageTag: b5d5f177-d1fc-48e0-9ce3-d95cfadd13cf
+		summarizeBy: none
+		sourceColumn: Developer responsible
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	/// Message about the report or semantic model, shown to users when it is not empty.
+	column Message
+		dataType: string
+		isHidden
+		lineageTag: aaae5fea-9bd3-4172-a95d-f4b552d6831a
+		summarizeBy: none
+		sourceColumn: Message
+
+		annotation SummarizationSetBy = Automatic
+
+	/// Link to the data product documentation (PDF of docs/Aaro endpoint (sm).md in the Group Analytics SharePoint folder), from the list column Documentation link.
+	column 'Documentation link'
+		dataType: string
+		isHidden
+		lineageTag: 5f75a036-556a-4177-92ae-70c0751ff135
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: Documentation link
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	partition '_Report Info' = m
+		mode: import
+		queryGroup: '5. Load to Data Model\Disconnected Tables'
+		source =
+				let
+				    Source = src_sharepoint_analytics_report_info,
+				
+				    // Host of the SharePoint tenant, for example https://vitrolifeglobal.sharepoint.com
+				    Get_SharePoint_Host = Text.BeforeDelimiter(p_analytics_metadata_site_root_path, "/sites/"),
+				
+				    // A SharePoint hyperlink column can arrive as a record with Url and Description: keep the Url.
+				    // A link to the same tenant can arrive relative (/:b:/r/sites/...): add the host, so Power BI shows a clickable link.
+				    Documentation_Link_As_Text =
+				        Table.TransformColumns(
+				            Source,
+				            {{"Documentation link", each
+				                let
+				                    Get_Url = if _ is record then Record.FieldOrDefault(_, "Url", null) else _
+				                in
+				                    if Get_Url is text and Text.StartsWith(Get_Url, "/") then Get_SharePoint_Host & Get_Url else Get_Url,
+				              type text}}
+				        ),
+				
+				    // Only the columns the Definition page uses
+				    Select_Columns =
+				        Table.SelectColumns(
+				            Documentation_Link_As_Text,
+				            {"Report owner", "Target owner", "Report", "Semantic model", "Report refresh frequency", "Report overview", "Data model description", "Refinement needed?", "Found error?", "Developer responsible", "Message", "Documentation link"}
+				        )
+				in
+				    Select_Columns
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

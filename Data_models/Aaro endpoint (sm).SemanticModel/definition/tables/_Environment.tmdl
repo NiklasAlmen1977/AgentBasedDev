@@ -1,0 +1,153 @@
+/// The environment the model is connected to (DEV, TEST or ACC, PROD; TEST is being replaced by ACC), with the colours for the environment banner.
+table _Environment
+	isHidden
+	lineageTag: 26248aca-4c09-4e1c-a75b-e88faaac2384
+
+	/// Environment banner text: a coloured marker and the environment name for DEV, TEST and ACC, empty in production.
+	measure 'Label - Connected environment' =
+			
+			VAR _v_environment = SELECTEDVALUE( _Environment[Display name] )
+			RETURN
+			    SWITCH(
+			        TRUE( ),
+			        _v_environment = "DEV", "🔴DEV",
+			        _v_environment = "TEST", "🟠TEST",
+			        _v_environment = "ACC", "🟠ACC",
+			        ""
+			    )
+		isHidden
+		displayFolder: .Environment
+		lineageTag: aa71ec65-c240-4cfd-9f3c-45e02700246d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Background colour of the environment banner.
+	measure '_cf_Environment background' =
+			
+			SELECTEDVALUE( _Environment[Background hex] )
+		isHidden
+		displayFolder: .Environment
+		lineageTag: 78280e91-a124-4c46-8cbb-82606c7a66aa
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Text colour of the environment banner.
+	measure '_cf_Environment text' =
+			
+			SELECTEDVALUE( _Environment[Text hex] )
+		isHidden
+		displayFolder: .Environment
+		lineageTag: 85bf3bc9-b3f8-4310-a3a0-74c622cd769a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Environment
+		dataType: string
+		isHidden
+		lineageTag: dcbf89f1-d0b4-4413-8927-91c2e5bd7f16
+		summarizeBy: none
+		sourceColumn: Environment
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'Display name'
+		dataType: string
+		isHidden
+		lineageTag: fc0de1cf-40cf-490a-85fb-21f15ea42cbb
+		summarizeBy: none
+		sourceColumn: Display name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Background hex'
+		dataType: string
+		isHidden
+		lineageTag: ec30e7e2-da70-48b1-a337-39a9200d4321
+		summarizeBy: none
+		sourceColumn: Background hex
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Text hex'
+		dataType: string
+		isHidden
+		lineageTag: 7e16a76c-6764-4442-9f72-6677037ff961
+		summarizeBy: none
+		sourceColumn: Text hex
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Is prod'
+		dataType: boolean
+		isHidden
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: b2cf5ad1-9232-4680-9ab7-6c63b9be227d
+		summarizeBy: none
+		sourceColumn: Is prod
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	column 'SharePoint site root path'
+		dataType: string
+		isHidden
+		lineageTag: 7256f54d-a75f-4db8-9695-4525288cb829
+		summarizeBy: none
+		sourceColumn: SharePoint site root path
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	/// Host name of the on-premises SQL Server data warehouse for the environment (the value of p_datawarehouse_server_host_name).
+	column 'Data warehouse server host name'
+		dataType: string
+		isHidden
+		lineageTag: 8f11a248-2bf2-421c-b5b5-4fa0caba976c
+		summarizeBy: none
+		sourceColumn: Data warehouse server host name
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	/// Host name of the Fabric SQL analytics endpoint for the environment (the value of p_sql_endpoint_server_host_name).
+	column 'SQL endpoint server host name'
+		dataType: string
+		isHidden
+		lineageTag: 2c7e9b14-5f3a-4d86-b0e2-9a4c1d7f3e58
+		summarizeBy: none
+		sourceColumn: SQL endpoint server host name
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	/// Database name on the SQL analytics endpoint for the environment, for example the lakehouse name.
+	column 'SQL database name'
+		dataType: string
+		isHidden
+		lineageTag: 6f0a3d8e-4b21-4c97-8e5d-1a9b7c2e4f36
+		summarizeBy: none
+		sourceColumn: SQL database name
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	partition _Environment = m
+		mode: import
+		queryGroup: '5. Load to Data Model\Disconnected Tables'
+		source =
+				let
+				    Source = stg_analytics_environment
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

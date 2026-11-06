@@ -1,0 +1,242 @@
+/// Helper measures used by the report layout: refresh status, footer labels, icons and conditional formatting colours.
+table _Helpers
+	isHidden
+	lineageTag: d3679bf0-41c5-4325-a1a5-9e2dc03434c0
+
+	/// Shows the last accounting period loaded, so users can see how recent the data is.
+	measure 'Refresh status' =
+			
+			// The Aaro export has no load timestamp, so the latest accounting period is used
+			VAR _v_last_period =
+			    CALCULATE(
+			        MAX( 'GL Balance Snapshots*'[accounting_period] ),
+			        REMOVEFILTERS( 'GL Balance Snapshots*' )
+			    )
+			VAR _v_result = "Last accounting period in the model " & _v_last_period
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report
+		lineageTag: 005a3aba-2cfc-46cd-aa5b-fa8ba59ed24d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Greeting with the user name taken from the user's sign-in, for example Welcome JANE.DOE!
+	measure 'Welcome user' =
+			
+			VAR _v_user = USERPRINCIPALNAME( )
+			RETURN
+			    "Welcome " & UPPER( LEFT( _v_user, SEARCH( "@", _v_user ) - 1 ) ) & "!"
+		isHidden
+		displayFolder: .Report
+		lineageTag: f0d531ce-5235-42fc-bc6b-032be10a50a0
+
+	/// Yesterday's date.
+	measure Yesterday =
+			
+			TODAY( ) - 1
+		isHidden
+		displayFolder: .Dates
+		lineageTag: 12c41edf-3cd2-4484-b5c3-52bef6f1b72c
+
+	/// Icon for a decrease: a down arrow.
+	measure 'Icon direction down' =
+			
+			UNICHAR( 9660 )
+		isHidden
+		displayFolder: .Icons and symbols
+		lineageTag: 50c8c860-b9dc-44af-8498-e0ebbef1f41c
+
+	/// Icon for an increase: an up arrow.
+	measure 'Icon direction up' =
+			
+			UNICHAR( 9650 )
+		isHidden
+		displayFolder: .Icons and symbols
+		lineageTag: 07b56cf4-cb27-4ead-8a85-689087ddcd1d
+
+	/// Icon style in use: 1 = arrows (show the direction of the change), 2 = thumbs (show whether the change is good or bad).
+	measure 'Icon type' =
+			
+			// Up/down icon pairs: arrows 9650/9660, thumbs 128402/128403 (conditional colour works), thumbs 128077/128078 (yellow hand, no conditional colour)
+			VAR _v_unicode_up = UNICODE( [Icon direction up] )
+			VAR _v_unicode_down = UNICODE( [Icon direction down] )
+			RETURN
+			    SWITCH(
+			        TRUE( ),
+			        _v_unicode_up = 9650 && _v_unicode_down = 9660, 1,
+			        _v_unicode_up = 128402 && _v_unicode_down = 128403, 2,
+			        _v_unicode_up = 128077 && _v_unicode_down = 128078, 2,
+			        BLANK( )
+			    )
+		isHidden
+		displayFolder: .Icons and symbols
+		lineageTag: 192bbd8b-e7c2-45c4-ba22-7c7639d9268e
+
+	/// Symbol for an increase, used in labels.
+	measure 'Symbol increase' =
+			
+			" ▲"
+		isHidden
+		displayFolder: .Icons and symbols
+		lineageTag: f06d846e-a0b8-47d4-8bfc-56b3ee15da98
+
+	/// Symbol for no change, used in labels.
+	measure 'Symbol neutral' =
+			
+			" -"
+		isHidden
+		displayFolder: .Icons and symbols
+		lineageTag: 4faca7fc-92f4-436d-a91f-4803a96c77fb
+
+	/// Symbol for a decrease, used in labels.
+	measure 'Symbol decrease' =
+			
+			" ▼"
+		isHidden
+		displayFolder: .Icons and symbols
+		lineageTag: 6b6ce68b-442a-43ed-b72b-80a8b0a5d477
+
+	/// Conditional formatting colour for a good result.
+	measure '_cf_Good color' =
+			
+			"#5F8A66"
+		isHidden
+		displayFolder: .Conditional formatting colours
+		lineageTag: 55cdc698-c7e2-4dc1-abc1-c2c47d9d0e99
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Conditional formatting colour for a bad result.
+	measure '_cf_Bad color' =
+			
+			"#C96A73"
+		isHidden
+		displayFolder: .Conditional formatting colours
+		lineageTag: e1005ffc-5a27-43f9-a8a5-5794f59b9134
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// Conditional formatting colour for a neutral result.
+	measure '_cf_Neutral color' =
+			
+			"#D5C27A"
+		isHidden
+		displayFolder: .Conditional formatting colours
+		lineageTag: 2a530d01-d0bb-42ec-be54-dfe292fa3715
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	/// The signed-in user for the footer, for example JANE.DOE.
+	measure 'Label - Footer user' =
+			
+			VAR _v_user = USERPRINCIPALNAME( )
+			VAR _v_result = UPPER( LEFT( _v_user, SEARCH( "@", _v_user, 1, LEN( _v_user ) + 1 ) - 1 ) )
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report\.Footer
+		lineageTag: 7f72c6b5-9f7f-4312-9d6a-cf55f996e32e
+
+	/// The selected accounting periods for the footer, for example 2603A, or 2601A – 2603A when more than one is selected.
+	measure 'Label - Footer period' =
+			
+			VAR _v_first_period = MIN( 'GL Balance Snapshots*'[accounting_period] )
+			VAR _v_last_period = MAX( 'GL Balance Snapshots*'[accounting_period] )
+			VAR _v_result =
+			    IF(
+			        _v_first_period = _v_last_period,
+			        _v_first_period,
+			        _v_first_period & " – " & _v_last_period
+			    )
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report\.Footer
+		lineageTag: 1ddc1c2d-3e80-4edf-beec-fa41583cba00
+
+	/// The last accounting period loaded, for the footer, regardless of the selection.
+	measure 'Label - Footer last date' =
+			
+			VAR _v_last_period =
+			    CALCULATE(
+			        MAX( 'GL Balance Snapshots*'[accounting_period] ),
+			        REMOVEFILTERS( 'GL Balance Snapshots*' )
+			    )
+			VAR _v_result = _v_last_period
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report\.Footer
+		lineageTag: f1965270-fd58-4d15-9474-5fab297d3b12
+
+	/// The company selected for the Aaro export, for the footer; asks for a selection while not exactly one is selected.
+	measure 'Label - Footer company' =
+			
+			VAR _v_company =
+			    CALCULATE(
+			        SELECTEDVALUE( 'GL Balance Snapshots*'[company_code] ),
+			        ALLSELECTED( 'GL Balance Snapshots*'[company_code] )
+			    )
+			VAR _v_result = COALESCE( _v_company, "Select one" )
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report\.Footer
+		lineageTag: 89f0b420-211c-48d9-a971-f09f323fae0e
+
+	/// The accounting period selected for the Aaro export, for the footer; asks for a selection while not exactly one is selected.
+	measure 'Label - Footer accounting period' =
+			
+			VAR _v_period =
+			    CALCULATE(
+			        SELECTEDVALUE( 'GL Balance Snapshots*'[accounting_period] ),
+			        ALLSELECTED( 'GL Balance Snapshots*'[accounting_period] )
+			    )
+			VAR _v_result = COALESCE( _v_period, "Select one" )
+			RETURN
+			    _v_result
+		isHidden
+		displayFolder: .Report\.Footer
+		lineageTag: 6bf50482-157e-4127-a4fd-96650bd17259
+
+	/// Short instructions for the Validation page header: choose a company and a period to see the rows as they come into Excel.
+	measure 'Label - Instructions Aaro export' =
+			
+			"1. Company  ·  2. Accounting period  ·  the table shows what you get in Excel"
+		isHidden
+		displayFolder: .Report\.Header
+		lineageTag: 75829c30-7415-44f3-956e-d1abf1219cbe
+
+	/// Short instructions for the page header: slicers, visuals and the filter pane.
+	measure 'Label - Instructions' =
+			
+			"Use the slicers  ·  click a visual to filter"
+		isHidden
+		displayFolder: .Report\.Header
+		lineageTag: 38fe17db-c563-4f70-9b02-3c36167bcf40
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: a282d073-1e88-41f1-9521-0ee297d9c7ef
+		summarizeBy: none
+		sourceColumn: dummy
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation BestPracticeAnalyzer_IgnoreRules = {"RuleIDs":["GA_HIDDEN_UNUSED_COLUMNS_REVIEW"]}
+
+	partition _Helpers = m
+		mode: import
+		queryGroup: '5. Load to Data Model\Disconnected Tables'
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlSKjQUA", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [dummy = _t])
+				in
+				    Source
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

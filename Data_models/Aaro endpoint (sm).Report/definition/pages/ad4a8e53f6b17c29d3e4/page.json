@@ -1,0 +1,88 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "ad4a8e53f6b17c29d3e4",
+  "displayName": "Validation",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "c9b2acde99235074a34d",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "GL Balance Snapshots*"
+              }
+            },
+            "Property": "gl_global_account_no"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "User"
+      },
+      {
+        "name": "250cc2de639baa190444",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "GL Balance Snapshots*"
+              }
+            },
+            "Property": "product_area_no"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "User"
+      },
+      {
+        "name": "a679985396bc448539db",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "GL Balance Snapshots*"
+              }
+            },
+            "Property": "responsibility_no"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "User"
+      },
+      {
+        "name": "cbbabef8fc0f919e3be1",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "GL Balance Snapshots*"
+              }
+            },
+            "Property": "counter_company"
+          }
+        },
+        "type": "Categorical",
+        "howCreated": "User"
+      }
+    ]
+  },
+  "pageBinding": {
+    "name": "de7b66a86c8b8635bc9e",
+    "type": "Default",
+    "parameters": [
+      {
+        "name": "4ce7f657d2ac59030a5f",
+        "boundFilter": "bf7fa924793dc09343b9",
+        "qnaSingleSelectRequired": true
+      },
+      {
+        "name": "b6d6cc9d3b8e3ffabada",
+        "boundFilter": "f2567923620ee0f2b093",
+        "qnaSingleSelectRequired": true
+      }
+    ]
+  }
+}
